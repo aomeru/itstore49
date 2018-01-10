@@ -47,6 +47,26 @@ class User extends Authenticatable
 		return $this->hasMany(Models\Allocation::class);
 	}
 
+    public function allocated()
+    {
+        return $this->hasMany(Models\Allocation::class, 'added_by');
+    }
+
+	public function tasks()
+    {
+        return $this->hasMany(Models\Task::class);
+    }
+
+	public function issues()
+    {
+        return $this->hasMany(Models\Task::class, 'client_id');
+    }
+
+    public function atasks()
+    {
+        return $this->hasMany(Models\Task::class, 'assigned_by');
+    }
+
 
 
 }

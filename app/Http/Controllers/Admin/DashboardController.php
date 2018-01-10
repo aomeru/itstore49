@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-//use Illuminate\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Validator;
@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\Validator;
 use Auth;
 use Session;
 use App\User;
-use Request;
+use App\Models\Inventory;
+use App\Models\Allocation;
+use App\Models\Log;
+use App\Models\Task;
 
 use App\Traits\CommonTrait;
 
@@ -18,10 +21,24 @@ class DashboardController extends Controller
 {
     use CommonTrait;
 
+	protected $delete_allow = array('Developer','Administrator');
+    protected $edit_allow = array('Developer','Administrator','Editor');
+    protected $task_allow = array('Developer','Supervisor');
+
+
 	public function index()
 	{
 
-		return view('admin.dashboard');
+		return view('admin.dashboard', [
+			'logs' => Log::where('user_id',Auth::user()->id)->orderby('created_at','desc')->limit(5)->get(),
+			'tasks' => in_array(Auth::user()->role->title, $this->task_allow) ? Task::orderby('created_at','desc')->limit(5)->get() : Task::where('user_id',Auth::user()->id)->orderby('created_at','desc')->limit(5)->get(),
+			'task_allow' => $this->task_allow,
+			'ftask' => Task::where('status','closed')->count(),
+			'tall' => Allocation::count(),
+			'rall' => Allocation::limit(10)->get(),
+			'tinv' => Inventory::count(),
+			'ttask' => Task::count(),
+		]);
 	}
 
 
@@ -40,7 +57,7 @@ class DashboardController extends Controller
 
 	public function logout()
 	{
-        $this->log(Auth::user()->id, 'Logged out', Request::path());
+        $this->log(Auth::user()->id, 'Logged out', Request()->path());
 		Auth::logout();
 		Session::flush();
 		return redirect()->route('home');
@@ -56,5 +73,11 @@ class DashboardController extends Controller
     public function process(Request $r)
     {
 
+    }
+
+
+	public function logs()
+    {
+		return view('admin.logs', ['logs' => Log::get(), 'nav' => 'logs']);
     }
 }

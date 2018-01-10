@@ -30,6 +30,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 
 	Route::get('/process', $dbcon.'@process')->name('process');
 
+	Route::get('/logs', $dbcon.'@logs')->name('logs');
+
 
 	Route::group(['prefix' => 'pages'], function(){
 		$con = 'Admin\PagesController@';
@@ -151,6 +153,31 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 		Route::post('/edit', $con.'update')->name($rkey.'.update');
 
 		Route::post('/delete', $con.'delete')->name($rkey.'.delete');
+
+	});
+
+
+	Route::group(['prefix' => 'tasks'], function () {
+		$con = 'Admin\TaskController@';
+		$rkey = 'admin.tasks';
+
+		Route::get('/', $con.'index')->name($rkey);
+
+		Route::post('/add', $con.'store')->name($rkey.'.add');
+
+		Route::post('/edit', $con.'update')->name($rkey.'.update');
+
+		Route::post('/reassign', $con.'rass')->name($rkey.'.rass');
+
+		Route::post('/delete', $con.'delete')->name($rkey.'.delete');
+
+		Route::get('/view/{code}', $con.'show')->name($rkey.'.show');
+
+		Route::post('/action/add', $con.'storeComment')->name($rkey.'.add.com');
+
+		Route::post('/action/edit', $con.'updateComment')->name($rkey.'.update.com');
+
+		Route::post('/action/delete', $con.'deleteComment')->name($rkey.'.delete.com');
 
 	});
 

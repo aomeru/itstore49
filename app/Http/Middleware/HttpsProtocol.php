@@ -16,14 +16,14 @@ class HttpsProtocol
     public function handle($request, Closure $next)
     {
 
-        if(config('app.secure'))
-        {
-            $request->setTrustedProxies( [ $request->getClientIp() ] );
-
-			if (!$request->secure() && config('app.env') == 'production') {
-                return redirect()->secure($request->getRequestUri());
-            }
-        }
+        // if(config('app.secure'))
+        // {
+        //     $request->setTrustedProxies( [ $request->getClientIp() ] );
+        //
+		// 	if (!$request->secure() && config('app.env') == 'production') {
+        //         return redirect()->secure($request->getRequestUri());
+        //     }
+        // }
 
         return $next($request);
 

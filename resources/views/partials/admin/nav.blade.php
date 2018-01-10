@@ -7,7 +7,7 @@
 
 		<p class="padding-15 c-ccc">
 			Welcome {{Auth::user()->firstname}}
-			<br> <span class="font-12x c-999">{{Auth::user()->email}}</span>
+			{{-- <br> <span class="font-12x c-999">{{Auth::user()->email}}</span> --}}
 		</p>
 
 		<ul id="menu">

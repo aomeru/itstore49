@@ -8,6 +8,7 @@ use App\Traits\CommonTrait;
 use App\Models\Unit;
 use App\Models\Department;
 use App\Models\Allocation;
+use App\Models\Task;
 use Session;
 use Crypt;
 use Illuminate\Support\Facades\Validator;
@@ -239,19 +240,20 @@ class DepartmentsController extends Controller
 			array_push($units,$unit->id);
 		}
 
-		//dd($units);
-
 		$alls = Allocation::whereHas('user', function($u) use ($units){
 			$u->whereIn('unit_id',$units);
 		})->get();
 
-		//dd($alls);
+		$iss = Task::whereHas('client', function($u) use ($units){
+			$u->whereIn('unit_id',$units);
+		})->get();
 
 		$this->log(Auth::user()->id, 'Opened the '.$dept->title.' department page.', Request()->path());
 
         return view('admin.departments.show', [
             'dept' => $dept,
             'alls' => $alls,
+			'iss' => $iss,
             'nav' => 'departments-and-units',
 			'edit_allow' => $this->edit_allow,
 			'delete_allow' => $this->delete_allow,
@@ -275,11 +277,16 @@ class DepartmentsController extends Controller
 			$u->where('unit_id',$unit->id);
 		})->get();
 
+		$iss = Task::whereHas('client', function($u) use ($unit){
+			$u->where('unit_id',$unit->id);
+		})->get();
+
 		$this->log(Auth::user()->id, 'Opened the '.$unit->title.' unit page.', Request()->path());
 
         return view('admin.departments.showUnit', [
             'unit' => $unit,
             'alls' => $alls,
+            'iss' => $iss,
             'nav' => 'departments-and-units',
 			'edit_allow' => $this->edit_allow,
 			'delete_allow' => $this->delete_allow,

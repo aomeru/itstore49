@@ -15,54 +15,30 @@
 
 	<div class="col-sm-12">
 
-		
-
-
-
-
-        <div class="card v-margin-50">
-        	<div class="card-block">
-
-        	</div>
-        </div>
-
-
-
-
-
-
-
-
-		<div class="row mb20">
-			<div class="col-sm-3 col-6 xs-mb20">
-				<div class="card">
+		<div class="row mb20 text-center">
+			<div class="col-sm-2 col-6 xs-mb20">
+				<div class="card card-primary">
 					<div class="card-block padding-10">
-						<span>xyz</span>
-						<h3 class="xs-font-20x no-bottom-margin font-600">hello everyone</h3>
+						<span class="font-20x c-fff">Tasks</span>
+						<h1 class="xs-font-20x no-bottom-margin font-600">{{$ttask}} ({{$ftask}})</h1>
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-3 col-6 xs-mb20">
-				<div class="card">
+
+			<div class="col-sm-2 col-6 xs-mb20">
+				<div class="card card-primary">
 					<div class="card-block padding-10">
-						<span>xyz</span>
-						<h3 class="xs-font-20x no-bottom-margin font-600">hello everyone</h3>
+						<span class="font-20x c-fff">Inventory</span>
+						<h1 class="xs-font-20x no-bottom-margin font-600">{{$tinv}}</h1>
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-3 col-6 xs-mb20">
-				<div class="card">
+
+			<div class="col-sm-2 col-6 xs-mb20">
+				<div class="card card-primary">
 					<div class="card-block padding-10">
-						<span>xyz</span>
-						<h3 class="xs-font-20x no-bottom-margin font-600">hello everyone</h3>
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-3 col-6 xs-mb20">
-				<div class="card">
-					<div class="card-block padding-10">
-						<span>xyz</span>
-						<h3 class="xs-font-20x no-bottom-margin font-600">hello everyone</h3>
+						<span class="font-20x c-fff">Allocation</span>
+						<h1 class="xs-font-20x no-bottom-margin font-600">{{$tall}}</h1>
 					</div>
 				</div>
 			</div>
@@ -70,73 +46,190 @@
 
 
 
-
-
-
-
-
-
 		<div class="row">
 			<div class="col-sm-6">
 				<div class="card mb50 xs-mb30">
 					<div class="card-header bgc-070">
-						<h5 class="font-600 text-center no-padding no-margin text-uppercase c-fff">dsjlkjdskjds</h5>
-					</div>
-					<div class="card-block text-center">
-
-						jnkdhkfjsdhijs
-
-					</div>
-				</div>
-
-			</div>
-
-
-			<div class="col-sm-6">
-				<div class="card mb50 xs-mb30">
-					<div class="card-header bgc-070"><h5 class="no-margin no-padding text-center font-600 text-uppercase c-fff">hjdsjdsbjds</h5></div>
-					<div class="card-block text-center">
-
-						<p class="mb0">
-							;dskjkdhsshkkjjksd
-						</p>
-
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-
-
-
-
-
-
-		<div class="row">
-
-			<div class="col-sm-4">
-				<div class="card mb30 xs-mb20">
-					<div class="card-block text-center">
-						<p class="no-bottom-margin"><em>dsddssd</em></p>
-						<h1 class="font3x font-600 c-2c5 no-bottom-margin">dssdsd</h1>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-sm-8">
-				<div class="card mb50 xs-mb30">
-					<div class="card-header bgc-070">
-						<h5 class="no-margin no-padding text-center font-600 text-uppercase c-fff">dsbskjdhsdj</h5>
+						<h5 class="font-600 text-center no-padding no-margin text-uppercase c-fff">Tasks</h5>
 					</div>
 					<div class="card-block">
 
+						@if ($tasks->count() == 0)
+
+							<p class="alert alert-info">No task record found.</p>
+
+						@else
+
+							<div class="table-responsive">
+
+								<table class="table table-bordered table-hover nowrap data-table" width="100%" data-page-length="10">
+
+									<thead>
+										<tr class="active">
+											<th>#</th>
+											<th>Title</th>
+											<th>Type</th>
+											<th>Client</th>
+											<th>Inventory</th>
+											@if(in_array(Auth::user()->role->title, $task_allow)) <th>Owner</th> @endif
+											<th>Status</th>
+											<th>Created</th>
+										</tr>
+									</thead>
+
+									<tbody>
+
+										@php $row_count = 1 @endphp
+
+										@foreach($tasks as $item)
+
+											<tr>
+
+												<td><u><a href="{{route('admin.tasks.show', Crypt::encrypt($item->id))}}" class="c-06f">{{$item->id}}</a></u></td>
+
+												<td>{{$item->title}} <span class="ml5 badge badge-primary font-no-bold">{{ $item->comments == null ? 0 : $item->comments->count() }}</span></td>
+
+												<td>{{$item->type}}</td>
+
+												<td>{{$item->client->firstname.' '.$item->client->lastname}}</td>
+
+												<td>
+													@if($item->inventory == null) <em class="c-999">Null</em> @else {{$item->inventory->item->title.' / '.$item->inventory->serial_no}} @endif
+												</td>
+
+												@if(in_array(Auth::user()->role->title, $task_allow)) <td>{{$item->user->firstname.' '.$item->user->lastname}}</td> @endif
+
+												<td class="text-center">
+													@if ($item->status == 'opened')
+
+														<span class="badge badge-warning font-no-bold padding-5 d-block">Open</span>
+
+													@elseif ($item->status == 'unresolved')
+
+														<span class="badge badge-danger font-no-bold padding-5 d-block">Unresolved</span>
+
+													@else
+
+														<span class="badge badge-success font-no-bold padding-5 d-block">Closed</span>
+
+													@endif
+												</td>
+
+												<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
+
+											</tr>
+
+											@php $row_count++ @endphp
+
+										@endforeach
+
+									</tbody>
+
+								</table>
+
+							</div>
+
+						@endif
 
 					</div>
 				</div>
+
+			</div>
+
+
+			<div class="col-sm-6">
+				<div class="card mb50 xs-mb30">
+					<div class="card-header bgc-070"><h5 class="no-margin no-padding text-center font-600 text-uppercase c-fff">Recent Activities</h5></div>
+					<div class="card-block">
+
+						@if ($logs->count() == 0)
+							<p class="alert alert-info">No recent activity on your account.</p>
+						@else
+							<ul class="list-group">
+								@foreach ($logs as $item)
+									<li class="list-group-item v-padding-20">{{ $item->descrip }}</li>
+								@endforeach
+							</ul>
+						@endif
+
+					</div>
+				</div>
+
 			</div>
 
 		</div>
+
+
+
+		<div class="card">
+
+			<div class="card-header bgc-070">
+				<h5 class="font-600 text-center no-padding no-margin text-uppercase c-fff">Recent Allocations</h5>
+			</div>
+
+			<div class="card-block">
+
+				@if ($rall->count() == 0)
+					<p class="alert alert-info">No allocation record found.</p>
+				@else
+
+					<div class="table-responsive">
+
+						<table class="data-table table table-striped table-bordered table-hover nowrap" width="100%" data-page-length="10">
+
+							<thead>
+								<tr class="active">
+									<th>#</th>
+									<th>Serial No</th>
+									<th>Item</th>
+									<th>Recipient</th>
+									<th>Department</th>
+									<th>Added By</th>
+									<th>Date</th>
+								</tr>
+							</thead>
+
+							<tbody>
+
+								@php $row_count = 1 @endphp
+
+								@foreach($rall as $item)
+
+									<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-serial-no="{{$item->inventory->serial_no}}" data-email="{{$item->user->email}}">
+										<td>{{ $row_count }}</td>
+										<td>{{ $item->inventory->serial_no }}</td>
+										<td>{{ $item->inventory->item->title }}</td>
+										<td><u><a href="{{route('admin.users.show', Crypt::encrypt($item->user->id))}}" class="c-06f">{{ $item->user->firstname.' '.$item->user->lastname }}</a></u></td>
+										<td>
+											@if ($item->user->unit != null)
+												<u><a href="{{route('admin.depts.show.unit', Crypt::encrypt($item->user->unit->id))}}" class="c-06f">{{ $item->user->unit->title }}</a></u>
+												<span class="c-999"> / </span>
+												<u><a href="{{route('admin.depts.show', Crypt::encrypt($item->user->unit->department_id))}}" class="c-06f">{{ $item->user->unit->department->title }}</a></u>
+											@else
+												<span class="c-999">Null</span>
+											@endif
+										</td>
+										<td>{{ $item->allocated->firstname.' '.$item->allocated->lastname }}</td>
+										<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
+
+									</tr>
+
+									@php $row_count++ @endphp
+
+								@endforeach
+
+							</tbody>
+
+						</table>
+					</div>
+
+				@endif
+
+			</div>
+
+		</div>
+
+
 
 	</div>
 </div>
@@ -196,11 +289,6 @@
 			$(".dataTables_wrapper").removeClass("form-inline");
 
 		});
-
-	</script>
-
-
-	<script>
 
 	</script>
 

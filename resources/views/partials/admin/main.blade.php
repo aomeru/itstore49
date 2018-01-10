@@ -21,7 +21,7 @@
 	</div>
 
 
-	<div class="outer v-margin-50 bgc-222 v-padding-15 xs-mb0">
+	<div class="outer mt50 bgc-333 v-padding-15 xs-mb0">
 		<div class="inner bg-dark bg-container">
 
 			<div class="row hidden-xs-down c-ccc">

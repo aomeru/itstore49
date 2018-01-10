@@ -123,17 +123,16 @@ class ItemsController extends Controller
 		if(!in_array($r->item_type,$this->item_types)) return response()->json(array('success' => false, 'errors' => ['errors' => ['Please select an Item type that is listed.']]), 400);
 		if(!empty($item_processor) && !in_array($r->item_processor,$this->item_processor)) return response()->json(array('success' => false, 'errors' => ['errors' => ['Please select an Item processor that is listed.']]), 400);
 
+        $ptitle = $item->title;
+        $ptype = $item->type;
+        $ppro = $item->processor;
+        $pdescrip = $item->descrip;
+
 		$item->title = ucwords($r->item_name);
 		$item->type = ucwords($r->item_type);
-
 		if($r->item_processor == 'none' || empty($r->item_processor)) $pro = ''; else $pro = ucfirst($r->item_processor);
 		$item->processor = $pro;
 		$item->descrip = ucwords($r->item_descrip);
-
-		$ptitle = $item->title;
-		$ptype = $item->type;
-		$ppro = $item->processor;
-		$pdescrip = $item->descrip;
 
 		if($item->update())
 		{

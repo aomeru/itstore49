@@ -47,6 +47,7 @@
 							<th>Email</th>
 							<th>Role</th>
 							<th>Department</th>
+							<th class="text-center">Issues</th>
 							<th class="text-center">Allocation</th>
 							<th class="text-center">Status</th>
 							<th class="text-right">Actions</th>
@@ -74,6 +75,8 @@
 								<td>{{$item->role->title}}</td>
 
 								<td>{!! $item->unit == null ? '<span class="c-999">N/A</span>' : $item->unit->department->title.' <span class="c-999 v-padding-5">/</span> '.$item->unit->title !!}</td>
+
+								<td class="text-center">{{$item->issues->count()}} ({{$item->issues()->where('status','closed')->count()}})</td>
 
 								<td class="text-center">{{$item->allocations->count()}}</td>
 

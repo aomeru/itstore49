@@ -26,6 +26,8 @@ class CreateCommentsTable extends Migration
 
             $table->enum('status', ['pending','reassigned','escalated','completed'])->default('pending');
 
+            $table->boolean('autogen')->default(0);
+
             $table->timestamps();
         });
 

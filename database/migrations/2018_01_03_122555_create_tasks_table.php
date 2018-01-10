@@ -25,9 +25,12 @@ class CreateTasksTable extends Migration
             $table->integer('assigned_by')->unsigned();
             $table->foreign('assigned_by')->references('id')->on('users');
 
+            $table->integer('client_id')->unsigned();
+            $table->foreign('client_id')->references('id')->on('users');
+
             $table->string('title');
 
-            $table->enum('status', ['opened','closed'])->default('opened');
+            $table->enum('status', ['opened','unresolved','closed'])->default('opened');
 
             $table->string('type');
 
@@ -35,7 +38,7 @@ class CreateTasksTable extends Migration
         });
 
         DB::update("ALTER TABLE tasks AUTO_INCREMENT = 68655");
-        
+
     }
 
     /**

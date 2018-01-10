@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', $dept->title.' Allocations')
+@section('title', $dept->title.' Allocations &amp; Tasks')
 @section('page_title') <i class="fa fa-th-large mr10"></i>{{$dept->title}} @endSection
 
 
@@ -130,6 +130,101 @@
 				</div>
 
 			</div>
+
+		</div>
+
+	</div>
+
+
+	<div class="card mt40">
+
+		<div class="card-header bgc-070">
+			<h4 class="font-600 text-center no-padding no-margin text-uppercase c-fff">{{$dept->title}} Tickets</h4>
+		</div>
+
+
+		<div class="card-block">
+
+			@if ($iss->count() == 0)
+
+				<p class="alert alert-info">There is no ticket raised by this department</p>
+
+			@else
+
+				<div class="table-responsive">
+
+					<table class="data-table table table-striped table-bordered table-hover nowrap" width="100%" data-page-length="10">
+
+						<thead>
+							<tr class="active">
+								<th>#</th>
+								<th>Task ID</th>
+								<th>Title</th>
+								<th>Type</th>
+								<th>Client</th>
+								<th>Inventory</th>
+								<th>Owner</th>
+								<th>Status</th>
+								<th>Created</th>
+							</tr>
+						</thead>
+
+						<tbody>
+
+							@php $row_count = 1 @endphp
+
+							@foreach($iss as $item)
+
+								<tr>
+
+									<td>{{ $row_count }}</td>
+
+									<td><u><a href="{{route('admin.tasks.show', Crypt::encrypt($item->id))}}" class="c-06f">{{$item->id}}</a></u></td>
+
+									<td>{{$item->title}} <span class="ml5 badge badge-primary font-no-bold">{{ $item->comments == null ? 0 : $item->comments->count() }}</span></td>
+
+									<td>{{$item->type}}</td>
+
+									<td>
+										@if(in_array(Auth::user()->role->title, $edit_allow)) <u><a href="{{route('admin.users.show', Crypt::encrypt($item->client_id))}}" class="c-06f">{{$item->client->firstname.' '.$item->client->lastname}}</a></u> @else {{$item->client->firstname.' '.$item->client->lastname}} @endif
+									</td>
+
+									<td>
+										@if($item->inventory == null) <em class="c-999">Null</em> @else {{$item->inventory->item->title.' / '.$item->inventory->serial_no}} @endif
+									</td>
+
+									<td><u><a href="{{route('admin.users.show', Crypt::encrypt($item->user_id))}}" class="c-06f">{{$item->user->firstname.' '.$item->user->lastname}}</a></u></td>
+
+									<td class="text-center">
+										@if ($item->status == 'opened')
+
+											<span class="badge badge-warning font-no-bold padding-5 d-block">Open</span>
+
+										@elseif ($item->status == 'unresolved')
+
+											<span class="badge badge-danger font-no-bold padding-5 d-block">Unresolved</span>
+
+										@else
+
+											<span class="badge badge-success font-no-bold padding-5 d-block">Closed</span>
+
+										@endif
+									</td>
+
+									<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
+
+								</tr>
+
+								@php $row_count++ @endphp
+
+							@endforeach
+
+						</tbody>
+
+					</table>
+				</div>
+
+			@endif
 
 		</div>
 
