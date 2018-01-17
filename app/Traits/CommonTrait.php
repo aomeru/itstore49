@@ -10,6 +10,8 @@ use Session;
 
 trait CommonTrait
 {
+	protected $acl = ['allocation' => [], 'task' => []];
+
 	public function get_time()
 	{
 		$date = new \DateTime();
