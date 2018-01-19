@@ -21,4 +21,19 @@ class Inventory extends Model
 	{
 		return $this->hasOne(Allocation::class);
 	}
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function log()
+    {
+        return $this->hasMany(Ilog::class);
+    }
+
+    public function purchase()
+    {
+        return $this->belongsTo(Purchase::class);
+    }
 }

@@ -10,7 +10,85 @@ use Session;
 
 trait CommonTrait
 {
-	protected $acl = ['allocation' => [], 'task' => []];
+	protected $acl = [
+		'allocation' => [
+			'create' => ['itsupport','enta'],
+			'edit' => ['itsupport','enta'],
+			'view' => ['all'],
+			'delete' => ['itsupport',],
+			'show' => [],
+		],
+		'comment' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'department' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'ilog' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'inventory' => [
+			'create' => ['itsupport','enta','cukaigwe'],
+			'edit' => ['itsupport','enta','cukaigwe'],
+			'view' => ['all'],
+			'delete' => ['itsupport',],
+			'show' => ['all'],
+		],
+		'item' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'log' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'plog' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'purchase' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'task' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+		'unit' => [
+			'create' => [],
+			'edit' => [],
+			'view' => [],
+			'delete' => [],
+			'show' => [],
+		],
+	];
 
 	public function get_time()
 	{

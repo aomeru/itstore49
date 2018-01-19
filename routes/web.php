@@ -26,7 +26,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 
 	Route::get('/logout', $dbcon.'@logout')->name('admin.logout');
 
-	Route::get('/test', $dbcon.'@test');
+	Route::get('/test', 'Admin\TestController@index');
 
 	Route::get('/process', $dbcon.'@process')->name('process');
 
@@ -134,6 +134,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 		Route::get('/', $con.'index')->name($rkey);
 
 		Route::post('/add', $con.'store')->name($rkey.'.add');
+
+		Route::get('/show/{code}', $con.'show')->name($rkey.'.show');
 
 		Route::post('/edit', $con.'update')->name($rkey.'.update');
 

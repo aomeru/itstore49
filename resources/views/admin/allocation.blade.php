@@ -50,6 +50,7 @@
 									<th>Item</th>
 									<th>Recipient</th>
 									<th>Department</th>
+									<th class="text-center">Approval</th>
 									<th>Added By</th>
 									<th>Date</th>
 									@if(in_array(Auth::user()->role->title,$edit_allow))
@@ -77,6 +78,9 @@
 											@else
 												<span class="c-999">Null</span>
 											@endif
+										</td>
+										<td class="text-center">
+											{!! $item->approval != null ? '<em class="c-999">Null</em>' : '<i class="fa fa-2x fa-file-pdf-o c-900"></i>' !!}
 										</td>
 										<td>{{ $item->allocated->firstname.' '.$item->allocated->lastname }}</td>
 										<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
@@ -119,7 +123,7 @@
 	<div class="modal fade" id="add-all-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
 			<div class="modal-content">
-				<form method="post">
+				<form method="post" enctype="multipart/form-data">
 
 				    <div class="modal-header mh-override">
 	                    <h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Allocate Item</h4>
@@ -147,6 +151,12 @@
 									<option value="{{$user->email}}">{{$user->firstname.' '.$user->lastname}}</option>
 								@endforeach
 							</select>
+	                    </div>
+
+
+						<div class="form-group input_field_sections">
+	                        <label for="approval" class="form-control-label text-center srr-only">Approval</label>
+							<input type="file" id="approval" class="form-control">
 	                    </div>
 
 
@@ -374,6 +384,7 @@
 				btn_text = btn.html(),
 				serial_no = $("#serial-no").val(),
 				email = $("#email").val(),
+				approval = $("#approval").val(),
 				token ='{{ Session::token() }}',
 				url = "{{route('admin.all.add')}}";
 
@@ -383,6 +394,7 @@
 					data: {
 						serial_no: serial_no,
 						email: email,
+						approval: approval,
 						_token: token
 					},
 					beforeSend: function () {

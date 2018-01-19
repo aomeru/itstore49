@@ -56,12 +56,14 @@
 	<div class="card">
 
 		<div class="card-block">
-			<div class="mb10">
-				<div class="pull-right">
-					<button class="btn btn-primary btn-sm no-margin" title="Add new inventory" data-toggle="modal" data-target="#add-inv-modal"><i class="fa fa-plus"></i></button>
+			@if(in_array(Auth::user()->username,$create_allow))
+				<div class="mb10">
+					<div class="pull-right">
+						<button class="btn btn-primary btn-sm no-margin" title="Add new inventory" data-toggle="modal" data-target="#add-inv-modal"><i class="fa fa-plus"></i></button>
+					</div>
+					<div class="clearfix"></div>
 				</div>
-				<div class="clearfix"></div>
-			</div>
+			@endif
 
 			@if ($invs->count() == 0)
 				<p class="alert alert-info">No inventory record found.</p>
@@ -78,13 +80,13 @@
 								<th>Type</th>
 								<th>Processor</th>
 								<th class="text-center">Allocated</th>
-								@if(in_array(Auth::user()->role->title,$delete_allow))
+								@if(in_array(Auth::user()->username,$delete_allow))
 									<th>Added by</th>
 									<th>Created</th>
 									<th>Updated</th>
 								@endif
 
-								@if(in_array(Auth::user()->role->title,$delete_allow) || in_array(Auth::user()->role->title,$edit_allow))
+								@if(in_array(Auth::user()->username,$delete_allow) || in_array(Auth::user()->username,$edit_allow))
 									<th class="text-center">Actions</th>
 								@endif
 							</tr>
@@ -95,18 +97,20 @@
 							@foreach($invs as $item)
 
 								<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-item-type="{{$item->item->title}}" data-serial-no="{{$item->serial_no}}">
-									<td>{{ $item->serial_no }}</td>
+									<td>
+										<u><a href="{{route('admin.inv.show', Crypt::encrypt($item->id))}}" class="c-06f">{{ $item->serial_no }}</a></u>
+									</td>
 									<td>{{ $item->item->title }}</td>
 									<td>{{ $item->item->type }}</td>
 									<td>{!! $item->item->processor == null ? '<span class="c-999">N/A</span>' : $item->item->processor !!}</td>
 									<td class="text-center">{!!$item->allocation == null ? '<span class="c-f00">No</span>' : '<span class="c-2c5">Yes</span>'!!}</td>
-									@if(in_array(Auth::user()->role->title,$delete_allow))
+									@if(in_array(Auth::user()->username,$delete_allow))
 										<td>{{$item->user->firstname.' '.$item->user->lastname}}</td>
 										<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
 										<td>{{date('d-m-y, g:ia', strtotime($item->updated_at))}}</td>
 									@endif
 
-									@if(in_array(Auth::user()->role->title,$delete_allow) || in_array(Auth::user()->role->title,$edit_allow))
+									@if(in_array(Auth::user()->username,$delete_allow) || in_array(Auth::user()->username,$edit_allow))
 										<td class="text-center">
 											<button class="btn btn-primary btn-sm" title="Edit {{ $item->serial_no }}" data-toggle="modal" data-target="#edit-inv-modal"><i class="fa fa-pencil"></i></button>
 											<button class="btn btn-danger btn-sm" title="Delete {{ $item->serial_no }}" data-toggle="modal" data-target="#delete-inv-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
@@ -135,101 +139,106 @@
 
 @section('page_footer')
 
-	<div class="modal fade" id="add-inv-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+	@if(in_array(Auth::user()->username,$create_allow))
+		<div class="modal fade" id="add-inv-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog w300" role="document">
+				<div class="modal-content">
+					<form method="post">
 
-				    <div class="modal-header mh-override">
-	                    <h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Inventory</h4>
-				    </div>
+						<div class="modal-header mh-override">
+							<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Inventory</h4>
+						</div>
 
-					<div class="modal-body">
+						<div class="modal-body">
 
-	                    <div class="form-group input_field_sections">
-	                        <label for="serial-no" class="form-control-label text-center sr-only">Serial No</label>
+							<div class="form-group input_field_sections">
+								<label for="serial-no" class="form-control-label text-center sr-only">Serial No</label>
 
-							<input type="text" id="serial-no" class="form-control" placeholder="Enter device serial number" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces &amp; hypen">
-	                    </div>
-
-						<div class="form-group input_field_sections">
-	                        <label for="item-type" class="form-control-label text-center sr-only">Type</label>
-
-							<select id="item-type" class="form-control chzn-select">
-								<option value="">Select Item Type</option>
-								@foreach($items as $item)
-									<option value="{{$item->title}}">{{$item->title}}</option>
-								@endforeach
-							</select>
-	                    </div>
-
-					</div>
-
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+								<input type="text" id="serial-no" class="form-control" placeholder="Enter device serial number" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces &amp; hypen">
 							</div>
-							<div class="col-6">
-								<button class="btn-success btn btn-block" id='add-inv-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
+
+							<div class="form-group input_field_sections">
+								<label for="item-type" class="form-control-label text-center sr-only">Type</label>
+
+								<select id="item-type" class="form-control chzn-select">
+									<option value="">Select Item Type</option>
+									@foreach($items as $item)
+										<option value="{{$item->title}}">{{$item->title}}</option>
+									@endforeach
+								</select>
+							</div>
+
+						</div>
+
+						<div class="modal-footer mh-override">
+							<div class="row">
+								<div class="col-6">
+									<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+								</div>
+								<div class="col-6">
+									<button class="btn-success btn btn-block" id='add-inv-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
+								</div>
 							</div>
 						</div>
-					</div>
-				</form>
+					</form>
+				</div>
 			</div>
 		</div>
-	</div>
+	@endif
 
-	<div class="modal fade" id="edit-inv-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+	@if(in_array(Auth::user()->username,$edit_allow))
+		<div class="modal fade" id="edit-inv-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog w300" role="document">
+				<div class="modal-content">
+					<form method="post">
 
-					<div class="modal-header mh-override">
-						<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Inventory</h4>
-					</div>
+						<div class="modal-header mh-override">
+							<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Inventory</h4>
+						</div>
 
-					<div class="modal-body">
+						<div class="modal-body">
 
-						<div class="form-group input_field_sections">
-						   <label for="serial-no-edit" class="form-control-label text-center sr-only">Serial No</label>
+							<div class="form-group input_field_sections">
+								<label for="serial-no-edit" class="form-control-label text-center sr-only">Serial No</label>
 
-						   <input type="text" id="serial-no-edit" class="form-control" placeholder="Enter device serial number" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces &amp; hypen">
-					   </div>
-
-					   <div class="form-group input_field_sections">
-						   <label for="item-type-edit" class="form-control-label text-center sr-only">Type</label>
-
-						   <select id="item-type-edit" class="form-control chzn-selectt">
-							   <option value="">Select Item Type</option>
-							   @foreach($items as $item)
-								   <option value="{{$item->title}}">{{$item->title}}</option>
-							   @endforeach
-						   </select>
-					   </div>
-
-					</div>
-
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+								<input type="text" id="serial-no-edit" class="form-control" placeholder="Enter device serial number" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces &amp; hypen">
 							</div>
-							<div class="col-6">
-								<input type="hidden" id="inv-row-id">
-								<input type="hidden" id="inv-id-edit">
-								<button class="btn-success btn btn-block" id='update-inv-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
+
+							<div class="form-group input_field_sections">
+								<label for="item-type-edit" class="form-control-label text-center sr-only">Type</label>
+
+								<select id="item-type-edit" class="form-control chzn-selectt">
+									<option value="">Select Item Type</option>
+									@foreach($items as $item)
+										<option value="{{$item->title}}">{{$item->title}}</option>
+									@endforeach
+								</select>
+							</div>
+
+						</div>
+
+						<div class="modal-footer mh-override">
+							<div class="row">
+								<div class="col-6">
+									<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+								</div>
+								<div class="col-6">
+									<input type="hidden" id="inv-row-id">
+									<input type="hidden" id="inv-id-edit">
+									<button class="btn-success btn btn-block" id='update-inv-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
+								</div>
 							</div>
 						</div>
-					</div>
-				</form>
+					</form>
+				</div>
 			</div>
 		</div>
-	</div>
+	@endif
 
-	<div class="modal fade" id="delete-inv-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
+	@if(in_array(Auth::user()->username,$create_allow))
+		<div class="modal fade" id="delete-inv-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog w300" role="document">
+				<div class="modal-content">
 
 					<div class="modal-body">
 
@@ -249,9 +258,10 @@
 							</div>
 						</div>
 					</div>
+				</div>
 			</div>
 		</div>
-	</div>
+	@endif
 
 @endsection
 

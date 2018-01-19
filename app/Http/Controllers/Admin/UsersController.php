@@ -64,6 +64,8 @@ class UsersController extends Controller
 		$user->firstname = ucfirst($r->firstname);
 		$user->lastname = ucfirst($r->lastname);
 		$user->email = $r->email;
+		$e = explode('@',$r->email);
+        $user->username = strtolower($e[0]);
 		$user->gender = $r->gender;
 		$user->unit_id = Unit::where('title',$r->unit_id)->value('id');
 
@@ -122,6 +124,8 @@ class UsersController extends Controller
 		$user->firstname = $r->firstname;
 		$user->lastname = $r->lastname;
 		$user->email = $r->email;
+		$e = explode('@',$r->email);
+        $user->username = strtolower($e[0]);
 		$user->gender = $r->gender;
 		$user->role_id = Role::where('title',$r->role_id)->value('id');
 		$user->unit_id = Unit::where('title',$r->unit_id)->value('id');

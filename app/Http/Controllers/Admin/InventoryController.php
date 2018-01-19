@@ -16,19 +16,32 @@ class InventoryController extends Controller
 {
     use CommonTrait;
 
-    protected $delete_allow = array('Developer','Administrator');
-    protected $edit_allow = array('Developer','Administrator','Editor');
+    protected $create_allow;
+	protected $edit_allow;
+    protected $view_allow;
+    protected $delete_allow;
+
+	public function __construct()
+	{
+		$this->create_allow = $this->acl['inventory']['create'];
+		$this->edit_allow = $this->acl['inventory']['edit'];
+	    $this->view_allow = $this->acl['inventory']['view'];
+	    $this->delete_allow = $this->acl['inventory']['delete'];
+	}
+
 
     public function index()
     {
 
 		$this->log(Auth::user()->id, 'Opened the items page.', Request()->path());
 
-        return view('admin.inventory', [
+        return view('admin.inventory.index', [
             'invs' => Inventory::orderby('serial_no')->get(),
             'items' => Item::orderby('title')->get(),
             'nav' => 'inventory',
+            'create_allow' => $this->create_allow,
             'edit_allow' => $this->edit_allow,
+            'view_allow' => $this->view_allow,
             'delete_allow' => $this->delete_allow,
         ]);
 
@@ -37,7 +50,7 @@ class InventoryController extends Controller
 
     public function store(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->create_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to add an inventory', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -68,7 +81,7 @@ class InventoryController extends Controller
 
 	public function update(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update an Inventory', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -113,7 +126,7 @@ class InventoryController extends Controller
 
 	public function delete(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->delete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete an inventory item', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -133,6 +146,34 @@ class InventoryController extends Controller
 		if($item->delete()){ $this->log(Auth::user()->id, 'Deleted "'.$ditem.'" with serial number "'.$dsn.'" from the inventory which had id: '.$did, $r->path()); return response()->json(array('success' => true, 'message' => 'Inventory item deleted'), 200);}
 
 		return response()->json(array('success' => false, 'errors' => ['errors' => ['Oops, something went wrong please try again']]), 400);
+	}
+
+
+	public function show($id)
+	{
+
+		$id = Crypt::decrypt($id);
+		$item = Inventory::find($id);
+
+		if($item == null)
+		{
+			Session::put('error','This inventory does not exist');
+			return redirect()->back();
+		}
+
+		$units = array();
+		foreach($dept->units as $unit)
+		{
+			array_push($units,$unit->id);
+		}
+
+		$this->log(Auth::user()->id, 'Opened the '.$item->item->title.' (#'.$item->serial_no.') inventory page.', Request()->path());
+
+        return view('admin.inventory.show', [
+            'item' => $item,
+            'nav' => 'departments-and-units',
+        ]);
+
 	}
 
 
