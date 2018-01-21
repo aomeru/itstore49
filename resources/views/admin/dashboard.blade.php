@@ -147,7 +147,12 @@
 						@else
 							<ul class="list-group">
 								@foreach ($logs as $item)
-									<li class="list-group-item v-padding-20">{{ $item->descrip }}</li>
+									<li class="list-group-item v-padding-20">
+										<p class="mb0">
+											{{ $item->descrip }}
+											<br><span class="font-12x">{{date('d-m-y, g:ia', strtotime($item->created_at))}}</span>
+										</p>
+									</li>
 								@endforeach
 							</ul>
 						@endif
