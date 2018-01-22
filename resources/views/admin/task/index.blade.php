@@ -62,7 +62,7 @@
 
 						@foreach($list as $item)
 
-							<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-title="{{$item->title}}" data-type="{{$item->type}}" data-client="{{$item->client->email}}" data-owner="{{$item->user->email}}" data-serial-no="{{$item->inventory_id}}" data-status="{{$item->status}}">
+							<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-title="{{$item->title}}" data-type="{{$item->type}}" data-client="{{$item->client->email}}" data-owner="{{$item->user->email}}" data-serial-no="{!!$item->inventory == null ? '' : $item->inventory->serial_no!!}" data-status="{{$item->status}}">
 
 								<td>{{ $row_count }}</td>
 
@@ -503,11 +503,11 @@
 				type = tr.data('type'),
 				status = tr.data('status'),
 				client = tr.data('client'),
-				serial_no = tr.data('inventoory-id'),
+				serial_no = tr.data('serial-no'),
 				task_id = tr.data('id'),
 				hrid = tr.data('hrid');
 
-			// console.log(user_id);
+			console.log(serial_no);
 
 			//console.log(title + " " + type + " " + processor + " " + descrip);
 
@@ -519,7 +519,7 @@
 			$("#task-id-edit").val(task_id);
 			$("#row-id").val(hrid);
 
-			console.log($("#task-id-edit").val());
+			//console.log($("#task-serial-no-edit").html());
 
 		});
 

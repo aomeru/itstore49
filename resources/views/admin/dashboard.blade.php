@@ -150,7 +150,7 @@
 									<li class="list-group-item v-padding-20">
 										<p class="mb0">
 											{{ $item->descrip }}
-											<br><span class="font-12x">{{date('d-m-y, g:ia', strtotime($item->created_at))}}</span>
+											<br><span class="font-12x c-999">{{date('d-m-y, g:ia', strtotime($item->created_at))}}</span>
 										</p>
 									</li>
 								@endforeach

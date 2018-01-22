@@ -141,6 +141,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 
 		Route::post('/delete', $con.'delete')->name($rkey.'.delete');
 
+		Route::post('/log/add', $con.'storeLog')->name($rkey.'.add.log');
+
+		Route::post('/log/edit', $con.'updateLog')->name($rkey.'.update.log');
+
+		Route::post('/log/delete', $con.'deleteLog')->name($rkey.'.delete.log');
+
 	});
 
 

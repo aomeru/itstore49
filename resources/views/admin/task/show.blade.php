@@ -264,7 +264,7 @@
 							<div class="col-6">
 								<input type="hidden" id="com-id-edit">
 								<input type="hidden" id="row-id">
-								<input type="hidden" value="{{Crypt::encrypt($task->id)}}" id="task-id">
+								<input type="hidden" value="{{Crypt::encrypt($task->id)}}" id="task-id-edit">
 								<button class="btn-success btn btn-block" id='edit-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
 							</div>
 						</div>

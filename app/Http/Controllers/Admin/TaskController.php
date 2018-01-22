@@ -161,7 +161,7 @@ class TaskController extends Controller
 		$item->type = ucwords($r->type);
 		$item->status = $r->status;
 		$item->client_id = User::where('email',$r->client)->value('id');
-		if($r->serial_no != null) $item->inventory_id = Inventory::where('serial_no',$r->serial_no)->value('id');
+		$item->inventory_id = $r->serial_no != null ? Inventory::where('serial_no',$r->serial_no)->value('id') : null;
 
 		if($item->update())
 		{

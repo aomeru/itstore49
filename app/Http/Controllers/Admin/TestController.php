@@ -5,11 +5,18 @@ namespace App\Http\Controllers\admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
+use Carbon;
 
 class TestController extends Controller
 {
     public function index()
     {
+        $mytime = Carbon\Carbon::now();
+        echo $mytime->toDateTimeString();
+        
+        //dd(time());
+        //dd(date('d-m-y, g:ia', time()));
+
         // $users = User::all();
         // foreach ($users as $u) {
         //     if($u->email != null)
