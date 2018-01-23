@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateTables extends Migration
+class UpdateAutoInc01 extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class UpdateTables extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('username', 50)->unique()->after('email');
-        });
-
-        Schema::table('allocations', function (Blueprint $table) {
-            $table->string('approval')->after('added_by')->nullable();
-        });
+        // DB::update("ALTER TABLE purchases AUTO_INCREMENT = 68655");
+        DB::update("ALTER TABLE plogs AUTO_INCREMENT = 25562");
+        DB::update("ALTER TABLE ilogs AUTO_INCREMENT = 12515");
     }
 
     /**

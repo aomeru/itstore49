@@ -296,7 +296,7 @@
 				<form method="post">
 
 					<div class="modal-header mh-override">
-						<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Action Point</h4>
+						<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Inventory Log Comment</h4>
 					</div>
 
 					<div class="modal-body">

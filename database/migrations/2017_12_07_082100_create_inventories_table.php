@@ -20,7 +20,10 @@ class CreateInventoriesTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
 
             $table->integer('item_id')->unsigned();
-			$table->foreign('item_id')->references('id')->on('items');
+            $table->foreign('item_id')->references('id')->on('items');
+            
+             $table->integer('purchase_id')->unsigned()->after('item_id')->nullable();
+            $table->foreign('purchase_id')->references('id')->on('purchases');
 
             $table->string('serial_no',50)->unique();
 

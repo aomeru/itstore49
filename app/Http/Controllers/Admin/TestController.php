@@ -6,13 +6,16 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use Carbon;
+use Storage;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $mytime = Carbon\Carbon::now();
-        echo $mytime->toDateTimeString();
+        Storage::makeDirectory('public/purchase');
+        Storage::makeDirectory('public/approval');
+        //$mytime = Carbon\Carbon::now();
+        //echo $mytime->toDateTimeString();
         
         //dd(time());
         //dd(date('d-m-y, g:ia', time()));
@@ -26,5 +29,10 @@ class TestController extends Controller
         //         $u->update();
         //     }
         // }
+    }
+
+    public function folder()
+    {
+        
     }
 }

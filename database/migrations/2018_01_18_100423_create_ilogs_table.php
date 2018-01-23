@@ -26,6 +26,8 @@ class CreateIlogsTable extends Migration
 
             $table->timestamps();
         });
+
+        DB::update("ALTER TABLE ilogs AUTO_INCREMENT = 12515");
     }
 
     /**

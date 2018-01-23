@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+
 use App\Traits\CommonTrait;
 use App\Traits\AclTrait;
+
 use App\Models\Item;
 use App\Models\Inventory;
 use App\Models\Ilog;
+use App\Models\Purchase;
 use Session;
 use Crypt;
 use Illuminate\Support\Facades\Validator;
@@ -55,6 +58,7 @@ class InventoryController extends Controller
         return view('admin.inventory.index', [
             'invs' => Inventory::orderby('serial_no')->get(),
             'items' => Item::orderby('title')->get(),
+            'po' => Purchase::orderby('title')->get(),
             'nav' => 'inventory',
             'create_allow' => $this->create_allow,
             'edit_allow' => $this->edit_allow,
@@ -74,9 +78,13 @@ class InventoryController extends Controller
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
 		}
 
+		if($r->item_po != null) $r->item_po = Crypt::decrypt($r->item_po);
+		//return response()->json(array('success' => false, 'errors' => ['errors' => [$r->item_po]]), 400);
+
 		$rules = array(
 			'serial_no' => 'required|regex:/^([a-zA-Z0-9- ]+)$/|unique:inventories,serial_no',
 			'item_type' => 'required|exists:items,title',
+			'item_po' => 'nullable|exists:purchases',
 		);
 		$validator = Validator::make($r->all(), $rules);
 		if ($validator->fails()) {
@@ -89,6 +97,7 @@ class InventoryController extends Controller
 		$item = new Inventory();
 		$item->serial_no = strtoupper($r->serial_no);
 		$item->item_id = Item::where('title',$r->item_type)->value('id');
+		if($r->item_po != null) $item->purchase_id = $r->item_po;
 		$item->user_id = Auth::user()->id;
 
 		if($item->save()) { $this->log(Auth::user()->id, 'Added inventory with serial number "'.$item->serial_no.'" and id .'.$item->id, $r->path()); return response()->json(array('success' => true, 'message' => 'Inventory Added'), 200);}

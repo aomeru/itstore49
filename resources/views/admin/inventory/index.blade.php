@@ -96,7 +96,7 @@
 
 							@foreach($invs as $item)
 
-								<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-item-type="{{$item->item->title}}" data-serial-no="{{$item->serial_no}}">
+								<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-purchase-id="{{$item->purchase_id}}" data-item-type="{{$item->item->title}}" data-serial-no="{{$item->serial_no}}">
 									<td>
 										<u><a href="{{route('admin.inv.show', Crypt::encrypt($item->id))}}" class="c-06f">{{ $item->serial_no }}</a></u>
 									</td>
@@ -113,7 +113,7 @@
 									@if(in_array(Auth::user()->username,$delete_allow) || in_array(Auth::user()->username,$edit_allow))
 										<td class="text-center">
 											<button class="btn btn-primary btn-sm" title="Edit {{ $item->serial_no }}" data-toggle="modal" data-target="#edit-inv-modal"><i class="fa fa-pencil"></i></button>
-											<button class="btn btn-danger btn-sm" title="Delete {{ $item->serial_no }}" data-toggle="modal" data-target="#delete-inv-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
+											<button class="btn btn-danger btn-sm" title="Delete {{ $item->serial_no }}" data-toggle="modal" data-target="#delete-inv-modal" @if(!in_array(Auth::user()->username,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
 										</td>
 									@endif
 
@@ -168,6 +168,17 @@
 								</select>
 							</div>
 
+							<div class="form-group input_field_sections">
+								<label for="item-po" class="form-control-label text-center sr-only">Purchase Order</label>
+
+								<select id="item-po" class="form-control chzn-select">
+									<option value="">Select Purchase Order</option>
+									@foreach($po as $p)
+										<option value="{{Crypt::encrypt($p->id)}}">{{$p->title}}</option>
+									@endforeach
+								</select>
+							</div>
+
 						</div>
 
 						<div class="modal-footer mh-override">
@@ -215,6 +226,17 @@
 								</select>
 							</div>
 
+							<div class="form-group input_field_sections">
+								<label for="item-po-edit" class="form-control-label text-center sr-only">Purchase Order</label>
+
+								<select id="item-po-edit" class="form-control chzn-selectt">
+									<option value="">Select Purchase Order</option>
+									@foreach($po as $p)
+										<option value="{{Crypt::encrypt($p->id)}}">{{$p->title}}</option>
+									@endforeach
+								</select>
+							</div>
+
 						</div>
 
 						<div class="modal-footer mh-override">
@@ -235,7 +257,7 @@
 		</div>
 	@endif
 
-	@if(in_array(Auth::user()->username,$create_allow))
+	@if(in_array(Auth::user()->username,$delete_allow))
 		<div class="modal fade" id="delete-inv-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 			<div class="modal-dialog w300" role="document">
 				<div class="modal-content">
@@ -338,6 +360,7 @@
 				btn_text = btn.html(),
 				serial_no = $("#serial-no").val(),
 				item_type = $("#item-type").val(),
+				item_po = $("#item-po").val(),
 				token ='{{ Session::token() }}',
 				url = "{{route('admin.inv.add')}}";
 
@@ -347,6 +370,7 @@
 				data: {
 					serial_no: serial_no,
 					item_type: item_type,
+					item_po: item_po,
 					_token: token
 				},
 				beforeSend: function () {
@@ -372,11 +396,13 @@
 				tr = btn.closest('tr'),
 				serial_no = tr.data('serial-no'),
 				item_type = tr.data('item-type'),
+				item_purchase_id = tr.data('item-purchase-id'),
 				hrid = tr.data('hrid'),
 				inv_id = tr.data('id');
 
 			$("#serial-no-edit").val(serial_no);
 			$("#item-type-edit").val(item_type);
+			$("#item-po-edit").val(item_purchase_id);
 			$("#inv-id-edit").val(inv_id);
 			$("#inv-row-id").val(hrid);
 
@@ -390,6 +416,7 @@
 				btn_text = btn.html(),
 				serial_no = $("#serial-no-edit").val(),
 				item_type = $("#item-type-edit").val(),
+				item_po = $("#item-po-edit").val(),
 				inv_id = $("#inv-id-edit").val(),
 				load_element = "#row-" + $("#inv-row-id").val(),
 				token ='{{ Session::token() }}',
@@ -401,6 +428,7 @@
 				data: {
 					serial_no: serial_no,
 					item_type: item_type,
+					item_po: item_po,
 					inv_id: inv_id,
 					_token: token
 				},

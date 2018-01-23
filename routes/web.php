@@ -27,6 +27,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 	Route::get('/logout', $dbcon.'@logout')->name('admin.logout');
 
 	Route::get('/test', 'Admin\TestController@index');
+	//Route::get('/folder', 'Admin\TestController@folder');
 
 	Route::get('/process', $dbcon.'@process')->name('process');
 
@@ -186,6 +187,23 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 		Route::post('/action/edit', $con.'updateComment')->name($rkey.'.update.com');
 
 		Route::post('/action/delete', $con.'deleteComment')->name($rkey.'.delete.com');
+
+	});
+
+
+	Route::group(['prefix' => 'purchase-order'], function () {
+		$con = 'Admin\PurchaseController@';
+		$rkey = 'admin.po';
+
+		Route::get('/', $con.'index')->name($rkey);
+
+		Route::post('/add', $con.'store')->name($rkey.'.add');
+
+		Route::post('/edit', $con.'update')->name($rkey.'.update');
+
+		Route::post('/delete', $con.'delete')->name($rkey.'.delete');
+		
+		Route::get('/show/{code}', $con.'show')->name($rkey.'.show');
 
 	});
 

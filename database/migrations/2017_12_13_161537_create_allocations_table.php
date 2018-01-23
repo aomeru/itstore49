@@ -25,6 +25,8 @@ class CreateAllocationsTable extends Migration
             $table->integer('added_by')->unsigned();
             $table->foreign('added_by')->references('id')->on('users');
 
+            $table->string('approval')->nullable();
+
             $table->timestamps();
         });
 

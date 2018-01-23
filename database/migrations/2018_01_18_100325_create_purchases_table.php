@@ -25,12 +25,16 @@ class CreatePurchasesTable extends Migration
             $table->string('dn')->nullable();
             $table->string('inv')->nullable();
 
+            $table->integer('total')->nullable();
+
             $table->timestamps();
 
             $table->timestamp('po_at')->nullable();
             $table->timestamp('dn_at')->nullable();
             $table->timestamp('inv_at')->nullable();
         });
+
+        DB::update("ALTER TABLE purchases AUTO_INCREMENT = 68655");
     }
 
     /**

@@ -29,6 +29,8 @@ class CreatePlogsTable extends Migration
 
             $table->timestamps();
         });
+
+        DB::update("ALTER TABLE plogs AUTO_INCREMENT = 25562");
     }
 
     /**
