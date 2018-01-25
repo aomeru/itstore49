@@ -12,6 +12,8 @@ Route::get('/create-password', 'Site\LoginController@createPassword')->name('cre
 
 Route::post('/store-password', 'Site\LoginController@storePassword')->name('store.pass');
 
+Route::get('{file}', 'Admin\PurchaseController@showFile')->name('showfile')->middleware('is-admin');
+
 
 Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 	$dbcon = 'Admin\DashboardController';
@@ -197,13 +199,25 @@ Route::group(['prefix' => 'admin', 'middleware' => 'is-admin'], function(){
 
 		Route::get('/', $con.'index')->name($rkey);
 
-		Route::post('/add', $con.'store')->name($rkey.'.add');
+		Route::get('/add', $con.'create')->name($rkey.'.add');
+		
+		Route::post('/add', $con.'store')->name($rkey.'.add.store');
+		
+		Route::get('/edit/{id}', $con.'edit')->name($rkey.'.edit');
 
-		Route::post('/edit', $con.'update')->name($rkey.'.update');
+		Route::post('/edit/{id}', $con.'update')->name($rkey.'.update');
+		
+		Route::post('/delete-file', $con.'deleteFile')->name($rkey.'.delete.file');
 
 		Route::post('/delete', $con.'delete')->name($rkey.'.delete');
 		
-		Route::get('/show/{code}', $con.'show')->name($rkey.'.show');
+		Route::get('/view/{code}', $con.'show')->name($rkey.'.show');
+
+		Route::post('/log/add', $con.'storeLog')->name($rkey.'.add.log');
+
+		Route::post('/log/edit', $con.'updateLog')->name($rkey.'.update.log');
+
+		Route::post('/log/delete', $con.'deleteLog')->name($rkey.'.delete.log');
 
 	});
 

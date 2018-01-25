@@ -30,7 +30,7 @@
 
 			<div class="table-responsive">
 
-				<table class="table table-bordered table-hover nowrap data-table" width="100%" data-page-length="50">
+				<table class="table table-bordered table-hover nowrrap data-table" width="100%" data-page-length="50">
 
 					<thead>
 						<tr class="active">

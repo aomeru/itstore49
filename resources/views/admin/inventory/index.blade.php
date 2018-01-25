@@ -71,7 +71,7 @@
 
 				<div class="table-responsive">
 
-					<table id="inv-table" class="data-table table table-striped table-bordered table-hover nowrap" width="100%" data-page-length="10">
+					<table id="inv-table" class="data-table table table-striped table-bordered table-hover nowrapp" width="100%" data-page-length="10">
 
 						<thead>
 							<tr class="active">
@@ -79,6 +79,7 @@
 								<th>Title</th>
 								<th>Type</th>
 								<th>Processor</th>
+								<th>PO</th>
 								<th class="text-center">Allocated</th>
 								@if(in_array(Auth::user()->username,$delete_allow))
 									<th>Added by</th>
@@ -103,6 +104,7 @@
 									<td>{{ $item->item->title }}</td>
 									<td>{{ $item->item->type }}</td>
 									<td>{!! $item->item->processor == null ? '<span class="c-999">N/A</span>' : $item->item->processor !!}</td>
+									<td>{!! $item->purchase == null ? '<span class="c-999">Null</span>' : $item->purchase->title !!}</td>
 									<td class="text-center">{!!$item->allocation == null ? '<span class="c-f00">No</span>' : '<span class="c-2c5">Yes</span>'!!}</td>
 									@if(in_array(Auth::user()->username,$delete_allow))
 										<td>{{$item->user->firstname.' '.$item->user->lastname}}</td>

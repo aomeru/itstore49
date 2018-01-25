@@ -78,13 +78,17 @@ class InventoryController extends Controller
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
 		}
 
-		if($r->item_po != null) $r->item_po = Crypt::decrypt($r->item_po);
-		//return response()->json(array('success' => false, 'errors' => ['errors' => [$r->item_po]]), 400);
+		if($r->item_po != null)
+		{
+			$po_id = Crypt::decrypt($r->item_po);
+			$po = Purchase::find($po_id);
+
+			if($po == null) return response()->json(array('success' => false, 'errors' => ['errors' => ['This purchase order does not exist.']]), 400);
+		}
 
 		$rules = array(
 			'serial_no' => 'required|regex:/^([a-zA-Z0-9- ]+)$/|unique:inventories,serial_no',
 			'item_type' => 'required|exists:items,title',
-			'item_po' => 'nullable|exists:purchases',
 		);
 		$validator = Validator::make($r->all(), $rules);
 		if ($validator->fails()) {
@@ -97,7 +101,7 @@ class InventoryController extends Controller
 		$item = new Inventory();
 		$item->serial_no = strtoupper($r->serial_no);
 		$item->item_id = Item::where('title',$r->item_type)->value('id');
-		if($r->item_po != null) $item->purchase_id = $r->item_po;
+		if($po != null) $item->purchase_id = $po->id;
 		$item->user_id = Auth::user()->id;
 
 		if($item->save()) { $this->log(Auth::user()->id, 'Added inventory with serial number "'.$item->serial_no.'" and id .'.$item->id, $r->path()); return response()->json(array('success' => true, 'message' => 'Inventory Added'), 200);}
@@ -119,6 +123,14 @@ class InventoryController extends Controller
 
 		if($item == null) return response()->json(array('success' => false, 'errors' => ['errors' => ['This item was not found in our inventory.']]), 400);
 
+		if($r->item_po != null)
+		{
+			$po_id = Crypt::decrypt($r->item_po);
+			$po = Purchase::find($po_id);
+
+			if($po == null) return response()->json(array('success' => false, 'errors' => ['errors' => ['This purchase order does not exist.']]), 400);
+		}
+
 		$rules = array(
 			'serial_no' => 'required|regex:/^([a-zA-Z0-9- ]+)$/|unique:inventories,serial_no,'.$item->id,
 			'item_type' => 'required|exists:items,title',
@@ -133,15 +145,18 @@ class InventoryController extends Controller
 
 		$psn = $item->serial_no;
 		$ptype = $item->item->title;
+		if($item->purchase != null) $ppo = $item->purchase->title;
 
 		$item->serial_no = strtoupper($r->serial_no);
 		$item->item_id = Item::where('title',$r->item_type)->value('id');
+		if($po != null) $item->purchase_id = $po->id;
 
 		if($item->update())
 		{
 			$this->log(Auth::user()->id,
-				'Updated inventory item serial-no from "'.$psn.'" to "'.$item->serial_no.'",
-				and from "'.$ptype.'" type to "'.$item->item->title.'",
+				'Updated inventory item serial-no from "'.$psn.'" to "'.$item->serial_no.'", 
+				from "'.$ptype.'" type to "'.$item->item->title.'",
+				and from "'.$ppo.'" purchase order to "'.$item->purchase->title.'", 
 				with id .'.$item->id,
 				$r->path());
 			return response()->json(array('success' => true, 'message' => 'Inventory item updated'), 200);
@@ -234,7 +249,7 @@ class InventoryController extends Controller
 		$log->user_id = Auth::user()->id;
 
 		if($log->save()) {
-			$this->log(Auth::user()->id, 'Added log comment for inventory item "#'.$inv->serial_no.' ('.$inv->item->title.')" with id: '.$inv->id, $r->path());
+			$this->log(Auth::user()->id, 'Added log comment for inventory item "#'.$inv->serial_no.' ('.$inv->item->title.')" with id: '.$log->id, $r->path());
 			return response()->json(array('success' => true, 'message' => 'Inventory log added'), 200);
 		}
 

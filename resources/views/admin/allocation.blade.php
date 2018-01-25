@@ -80,7 +80,7 @@
 											@endif
 										</td>
 										<td class="text-center">
-											{!! $item->approval != null ? '<em class="c-999">Null</em>' : '<i class="fa fa-2x fa-file-pdf-o c-900"></i>' !!}
+											{!! $item->approval == null ? '<em class="c-999">Null</em>' : '<i class="fa fa-2x fa-file-image-o c-900"></i>' !!}
 										</td>
 										<td>{{ $item->allocated->firstname.' '.$item->allocated->lastname }}</td>
 										<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>

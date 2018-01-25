@@ -125,4 +125,19 @@ trait CommonTrait
 		$log->descrip = $descrip;
 		$log->save();
 	}
+
+
+
+
+	public function ad()
+	{
+		Session::put('access_denied', 'YOU ARE NOT AUTHORIZED TO ACCESS THE REQUESTED PAGE.');
+	}
+
+
+	public function clean($string)
+	{
+		$string = str_replace(' ', '_', $string);
+		return preg_replace('/[^A-Za-z0-9\-]/', '', $string);
+	}
 }
