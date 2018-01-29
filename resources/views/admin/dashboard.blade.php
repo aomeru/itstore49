@@ -42,7 +42,22 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="col-sm-2 col-6 xs-mb20">
+				<div class="card card-{{ $reorder ? 'danger' : 'success'}}">
+					<div class="card-block padding-10">
+						<span class="font-20x c-fff">Reorder?</span>
+						<h1 class="xs-font-20x no-bottom-margin font-600 c-fff">{{$reorder ? 'Yes' : 'No'}}</h1>
+					</div>
+				</div>
+			</div>
 		</div>
+
+
+
+		@if($reorder)
+			<p class="alert alert-danger mb50 font-22x">Some inventory items needs to be reordered. <a href="{{ route('admin.items') }}" class="alert-link" title="View inventory items">Click here to see items.</a></p>
+		@endif
 
 
 

@@ -16,6 +16,10 @@
 
 @section('content')
 
+	@if($reorder)
+		<p class="alert alert-danger mb50 font-22x text-center">Some inventory items needs to be reordered.</p>
+	@endif
+
 	<div class="card">
 
 		<div class="card-block">
@@ -43,6 +47,7 @@
 								<th>Descrip</th>
 								<th class="text-center">Total</th>
 								<th class="text-center" title="Allocated / Available">Al/Av</th>
+								<th class="text-center" title="Reorder?">Reorder</th>
 								@if(in_array(Auth::user()->role->title,$delete_allow))
 									<th>Added by</th>
 									<th>Created</th>
@@ -75,8 +80,12 @@
 											foreach ($item->inventory as $val) {
 												if($val->allocation != null) $allocated += 1;
 											}
+											$avail = $inventory - $allocated;
 										?>
-										{{ $allocated }} / {{ $inventory - $allocated }}
+										{{ $allocated }} / {{ $avail }}
+									</td>
+									<td class="text-center">
+										{!! $avail <= config('app.rlevel') ? '<span class="c-f00">Yes</span>' : '<span class="c-090">No</span>' !!}
 									</td>
 									@if(in_array(Auth::user()->role->title,$delete_allow))
 										<td>{{$item->user->firstname.' '.$item->user->lastname}}</td>

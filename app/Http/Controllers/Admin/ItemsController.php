@@ -49,7 +49,8 @@ class ItemsController extends Controller
             'edit_allow' => $this->edit_allow,
             'delete_allow' => $this->delete_allow,
             'item_types' => $this->item_types,
-            'item_processor' => $this->item_processor
+			'item_processor' => $this->item_processor,
+			'reorder' => $this->check_inv(),
         ]);
 
     }

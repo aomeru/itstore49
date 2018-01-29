@@ -243,5 +243,7 @@ return [
     
     'bdyear' => env('BDYEAR'),
     'bd2018' => env('BD2018'),
+    
+    'rlevel' => env('RLEVEL'),
 
 ];

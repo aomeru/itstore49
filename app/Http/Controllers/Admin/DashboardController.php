@@ -14,6 +14,7 @@ use App\Models\Inventory;
 use App\Models\Allocation;
 use App\Models\Log;
 use App\Models\Task;
+use App\Models\Item;
 
 use App\Traits\CommonTrait;
 
@@ -23,7 +24,7 @@ class DashboardController extends Controller
 
 	protected $delete_allow = array('Developer','Administrator');
     protected $edit_allow = array('Developer','Administrator','Editor');
-    protected $task_allow = array('Developer','Supervisor');
+	protected $task_allow = array('Developer','Supervisor');
 
 
 	public function index()
@@ -38,6 +39,7 @@ class DashboardController extends Controller
 			'rall' => Allocation::limit(10)->get(),
 			'tinv' => Inventory::count(),
 			'ttask' => Task::count(),
+			'reorder' => $this->check_inv(),
 		]);
 	}
 

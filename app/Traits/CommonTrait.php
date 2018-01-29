@@ -6,6 +6,8 @@ use App\User;
 use App\Models\Log;
 use App\Models\Page;
 use App\Models\Permission;
+use App\Models\Item;
+
 use Session;
 
 trait CommonTrait
@@ -140,4 +142,25 @@ trait CommonTrait
 		$string = str_replace(' ', '_', $string);
 		return preg_replace('/[^A-Za-z0-9\-]/', '', $string);
 	}
+
+
+
+	private function check_inv()
+	{
+		$check = false;
+		$list = Item::all();
+		foreach($list as $item)
+		{
+			$inventory = $item->inventory == null ? 0 : $item->inventory->count();
+			$allocated = 0;
+			foreach ($item->inventory as $val) {
+				if($val->allocation != null) $allocated += 1;
+			}
+			$avail = $inventory - $allocated;
+			if($avail <= config('app.rlevel')) { $check = true; break;}
+		}
+		return $check;
+	}
+
+
 }
