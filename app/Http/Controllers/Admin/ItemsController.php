@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Traits\CommonTrait;
+use App\Traits\AclTrait;
 use App\Models\Item;
 use Session;
 use Crypt;
@@ -14,9 +15,14 @@ use Auth;
 class ItemsController extends Controller
 {
     use CommonTrait;
+    use AclTrait;
 
-    protected $delete_allow = array('Developer','Administrator');
-    protected $edit_allow = array('Developer','Administrator','Editor');
+    protected $create_allow;
+	protected $edit_allow;
+    protected $view_allow;
+    protected $delete_allow;
+    protected $show_allow;
+
     protected $item_types = array('Laptop','Monitor','Desktop','Workstation','Wireless Keyboard & Mouse','Keyboard','Mouse','Printer','Stand','Accessories','Plotter','Toner','Mobile Phone','Docking Station');
     protected $item_processor = array('None','Core i5','Core i3','Core i7');
 	protected $typet = '';
@@ -24,6 +30,12 @@ class ItemsController extends Controller
 
     public function __construct()
     {
+		$this->create_allow = $this->acl['item']['create'];
+		$this->edit_allow = $this->acl['item']['edit'];
+	    $this->view_allow = $this->acl['item']['view'];
+	    $this->delete_allow = $this->acl['item']['delete'];
+		$this->show_allow = $this->acl['item']['show'];
+		
         sort($this->item_types);
         sort($this->item_processor);
 
@@ -46,11 +58,15 @@ class ItemsController extends Controller
         return view('admin.items', [
             'list' => Item::orderby('title')->get(),
             'nav' => 'items',
-            'edit_allow' => $this->edit_allow,
-            'delete_allow' => $this->delete_allow,
             'item_types' => $this->item_types,
 			'item_processor' => $this->item_processor,
 			'reorder' => $this->check_inv(),
+
+			'create_allow' => $this->create_allow,
+            'edit_allow' => $this->edit_allow,
+            'view_allow' => $this->view_allow,
+            'delete_allow' => $this->delete_allow,
+            'show_allow' => $this->show_allow,
         ]);
 
     }
@@ -58,7 +74,7 @@ class ItemsController extends Controller
 
     public function storeItem(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to create an Item', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -97,7 +113,7 @@ class ItemsController extends Controller
 
     public function updateItem(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update an Item', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -153,7 +169,7 @@ class ItemsController extends Controller
 
 	public function deleteItem(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->delete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete an item', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);

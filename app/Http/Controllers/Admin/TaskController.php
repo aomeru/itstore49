@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use App\Traits\CommonTrait;
+use App\Traits\AclTrait;
+
 use App\Models\Task;
 use App\Models\Comment;
 use App\Models\Inventory;
@@ -18,9 +20,8 @@ use Auth;
 class TaskController extends Controller
 {
     use CommonTrait;
+	use AclTrait;
 
-    protected $delete_allow = array('Developer');
-    protected $edit_allow = array('Developer','Supervisor');
     protected $owners = array('Developer','Supervisor','Administrator','Editor','Manager');
     protected $task_types = array('Repairs','License','Network Connectivity','Application Support');
     protected $task_status = array('opened','unresolved','closed');
@@ -28,6 +29,19 @@ class TaskController extends Controller
 	protected $statust = '';
 	protected $astatust = '';
 	protected $typet = '';
+
+
+    protected $create_allow;
+	protected $edit_allow;
+    protected $view_allow;
+    protected $delete_allow;
+    protected $show_allow;
+	
+	protected $lcreate_allow;
+	protected $ledit_allow;
+    protected $lview_allow;
+    protected $ldelete_allow;
+    protected $lshow_allow;
 
     public function __construct()
     {
@@ -44,13 +58,26 @@ class TaskController extends Controller
 		$this->typet = substr($tt,0,-1);
 		$this->statust = substr($ts,0,-1);
 		$this->astatust = substr($tas,0,-1);
+
+		$this->create_allow = $this->acl['task']['create'];
+		$this->edit_allow = $this->acl['task']['edit'];
+	    $this->view_allow = $this->acl['task']['view'];
+	    $this->delete_allow = $this->acl['task']['delete'];
+	    $this->show_allow = $this->acl['task']['show'];
+		
+		$this->lcreate_allow = $this->acl['comment']['create'];
+		$this->ledit_allow = $this->acl['comment']['edit'];
+	    $this->lview_allow = $this->acl['comment']['view'];
+	    $this->ldelete_allow = $this->acl['comment']['delete'];
+	    $this->lshow_allow = $this->acl['comment']['show'];
     }
+
 
     public function index()
     {
         $this->log(Auth::user()->id, 'Opened the task page.', Request()->path());
 
-		$list = in_array(Auth::user()->role->title,$this->edit_allow) ? Task::orderby('created_at','desc')->get() : Task::where('user_id',Auth::user()->id)->orderby('created_at','desc')->get();
+		$list = in_array(Auth::user()->username,$this->edit_allow) ? Task::orderby('created_at','desc')->get() : Task::where('user_id',Auth::user()->id)->orderby('created_at','desc')->get();
 
         return view('admin.task.index', [
             'list' => $list,
@@ -60,16 +87,20 @@ class TaskController extends Controller
             'staff' => User::orderby('firstname')->get(),
             'invs' => Inventory::orderby('serial_no')->get(),
             'nav' => 'tasks',
-            'edit_allow' => $this->edit_allow,
-            'delete_allow' => $this->delete_allow,
             'task_types' => $this->task_types,
-            'task_status' => $this->task_status,
+			'task_status' => $this->task_status,
+			'create_allow' => $this->create_allow,
+            'edit_allow' => $this->edit_allow,
+            'view_allow' => $this->view_allow,
+            'delete_allow' => $this->delete_allow,
+            'show_allow' => $this->show_allow,
         ]);
     }
 
+
     public function store(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to assign a task', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -116,9 +147,10 @@ class TaskController extends Controller
 		return response()->json(array('success' => false, 'errors' => ['errors' => ['Oops, something went wrong please try again']]), 400);
 	}
 
+
 	public function update(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update a task', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -189,9 +221,10 @@ class TaskController extends Controller
 		return response()->json(array('success' => false, 'errors' => ['errors' => ['Oops, something went wrong please try again']]), 400);
 	}
 
+
 	public function rass(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to reassign a task', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -238,7 +271,7 @@ class TaskController extends Controller
 
 	public function delete(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->delete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete a task', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -260,8 +293,16 @@ class TaskController extends Controller
 		return response()->json(array('success' => false, 'errors' => ['errors' => ['Oops, something went wrong please try again']]), 400);
 	}
 
+
 	public function show($id)
 	{
+
+		if(!in_array(Auth::user()->username,$this->lshow_allow))
+		{
+			$this->log(Auth::user()->id, 'RESTRICTED! Tried to access a department page', Request()->path());
+			$this->ad();
+            return redirect()->back();
+		}
 
 		$id = Crypt::decrypt($id);
 		$task = Task::find($id);
@@ -272,7 +313,7 @@ class TaskController extends Controller
 			return redirect()->back();
 		}
 
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(Auth::user()->role->title != 'Developer')
 		{
 			if(Auth::user()->id != $task->user_id)
 			{
@@ -291,12 +332,16 @@ class TaskController extends Controller
 			'actions' => Comment::where('task_id',$task->id)->orderby('created_at','desc')->paginate(10),
             'nav' => 'tasks',
 			'faid' => $faid->id,
-			'edit_allow' => $this->edit_allow,
-			'delete_allow' => $this->delete_allow,
+			'create_allow' => $this->lcreate_allow,
+            'edit_allow' => $this->ledit_allow,
+            'view_allow' => $this->lview_allow,
+			'delete_allow' => $this->ldelete_allow,
+			'show_allow' => $this->lshow_allow,
 			'action_status' => $this->action_status,
         ]);
 
     }
+
 
 	public function storeComment(Request $r)
 	{
@@ -307,7 +352,7 @@ class TaskController extends Controller
 
 		if($task->status == 'closed') return response()->json(array('success' => false, 'errors' => ['errors' => ['Action point cannot be added to this task as it has been marked closed']]), 400);
 
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(!in_array(Auth::user()->username,$this->lcreate_allow))
 		{
 			if(Auth::user()->id != $task->user_id)
 			{
@@ -353,6 +398,7 @@ class TaskController extends Controller
 
 		return response()->json(array('success' => false, 'errors' => ['errors' => ['Oops, something went wrong please try again']]), 400);
 	}
+
 
 	public function updateComment(Request $r)
 	{
@@ -405,9 +451,10 @@ class TaskController extends Controller
 		return response()->json(array('success' => false, 'errors' => ['errors' => ['Oops, something went wrong please try again']]), 400);
 	}
 
+
 	public function deleteComment(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->ldelete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete a task comment', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);

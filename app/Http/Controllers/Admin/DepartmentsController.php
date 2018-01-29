@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Traits\CommonTrait;
+use App\Traits\AclTrait;
 use App\Models\Unit;
 use App\Models\Department;
 use App\Models\Allocation;
@@ -19,20 +20,56 @@ use Auth;
 class DepartmentsController extends Controller
 {
     use CommonTrait;
+    use AclTrait;
 
-    protected $delete_allow = array('Developer','Administrator');
-    protected $edit_allow = array('Developer','Administrator','Editor');
+    protected $dcreate_allow;
+	protected $dedit_allow;
+    protected $dview_allow;
+    protected $ddelete_allow;
+    protected $dshow_allow;
+	
+	protected $ucreate_allow;
+	protected $uedit_allow;
+    protected $uview_allow;
+    protected $udelete_allow;
+    protected $ushow_allow;
 
-    public function index() {
+	public function __construct()
+	{
+		$this->dcreate_allow = $this->acl['department']['create'];
+		$this->dedit_allow = $this->acl['department']['edit'];
+	    $this->dview_allow = $this->acl['department']['view'];
+	    $this->ddelete_allow = $this->acl['department']['delete'];
+	    $this->dshow_allow = $this->acl['department']['show'];
+		
+		$this->ucreate_allow = $this->acl['unit']['create'];
+		$this->uedit_allow = $this->acl['unit']['edit'];
+	    $this->uview_allow = $this->acl['unit']['view'];
+	    $this->udelete_allow = $this->acl['unit']['delete'];
+	    $this->ushow_allow = $this->acl['unit']['show'];
+	}
+
+	public function index()
+	{
 
 		$this->log(Auth::user()->id, 'Opened the departments and units page.', Request()->path());
 
         return view('admin.departments.index', [
             'depts' => Department::orderby('title')->get(),
             'units' => Unit::orderby('title')->get(),
-            'nav' => 'departments-and-units',
-			'edit_allow' => $this->edit_allow,
-			'delete_allow' => $this->delete_allow,
+			'nav' => 'departments-and-units',
+			
+			'dcreate_allow' => $this->dcreate_allow,
+            'dedit_allow' => $this->dedit_allow,
+            'dview_allow' => $this->dview_allow,
+            'ddelete_allow' => $this->ddelete_allow,
+			'dshow_allow' => $this->dshow_allow,
+
+			'ucreate_allow' => $this->ucreate_allow,
+            'uedit_allow' => $this->uedit_allow,
+            'uview_allow' => $this->uview_allow,
+            'udelete_allow' => $this->udelete_allow,
+            'ushow_allow' => $this->ushow_allow,
         ]);
 
     }
@@ -40,7 +77,7 @@ class DepartmentsController extends Controller
 
     public function storeDept(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(!in_array(Auth::user()->username,$this->dedit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to create a department', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -68,7 +105,7 @@ class DepartmentsController extends Controller
 
 	public function deleteDept(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->ddelete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete a department', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -92,7 +129,7 @@ class DepartmentsController extends Controller
 
 	public function updateDept(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(!in_array(Auth::user()->username,$this->dedit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update a department', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -126,7 +163,7 @@ class DepartmentsController extends Controller
 
 	public function storeUnit(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(!in_array(Auth::user()->username,$this->uedit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to create a unit', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -162,7 +199,7 @@ class DepartmentsController extends Controller
 
 	public function deleteUnit(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->udelete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete a unit', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -186,7 +223,7 @@ class DepartmentsController extends Controller
 
 	public function updateUnit(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(!in_array(Auth::user()->username,$this->uedit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update a unit', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -223,7 +260,15 @@ class DepartmentsController extends Controller
 	}
 
 
-    public function showDept($id) {
+	public function showDept($id)
+	{
+
+		if(!in_array(Auth::user()->username,$this->ushow_allow))
+		{
+			$this->log(Auth::user()->id, 'RESTRICTED! Tried to access a department page', Request()->path());
+			$this->ad();
+            return redirect()->back();
+		}
 
 		$id = Crypt::decrypt($id);
 		$dept = Department::find($id);
@@ -255,14 +300,22 @@ class DepartmentsController extends Controller
             'alls' => $alls,
 			'iss' => $iss,
             'nav' => 'departments-and-units',
-			'edit_allow' => $this->edit_allow,
-			'delete_allow' => $this->delete_allow,
+			'edit_allow' => $this->dedit_allow,
+			'delete_allow' => $this->ddelete_allow,
         ]);
 
     }
 
 
-	public function showUnit($id) {
+	public function showUnit($id)
+	{
+
+		if(!in_array(Auth::user()->username,$this->ushow_allow))
+		{
+			$this->log(Auth::user()->id, 'RESTRICTED! Tried to access a unit page', Request()->path());
+			 $this->ad();
+            return redirect()->back();
+		}
 
 		$id = Crypt::decrypt($id);
 		$unit = Unit::find($id);
@@ -288,8 +341,8 @@ class DepartmentsController extends Controller
             'alls' => $alls,
             'iss' => $iss,
             'nav' => 'departments-and-units',
-			'edit_allow' => $this->edit_allow,
-			'delete_allow' => $this->delete_allow,
+			'edit_allow' => $this->uedit_allow,
+			'delete_allow' => $this->udelete_allow,
         ]);
 
     }

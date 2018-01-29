@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use App\Traits\CommonTrait;
+use App\Traits\AclTrait;
+
 use App\Models\Allocation;
 use App\Models\Inventory;
 use App\User;
@@ -16,11 +18,25 @@ use Auth;
 
 class AllocationController extends Controller
 {
-    use CommonTrait;
+	use CommonTrait;
+	use AclTrait;
 
-    protected $delete_allow = array('Developer','Administrator');
-    protected $edit_allow = array('Developer','Administrator');
+    protected $create_allow;
+	protected $edit_allow;
+    protected $view_allow;
+    protected $delete_allow;
+    protected $show_allow;
 
+	public function __construct()
+	{
+		$this->create_allow = $this->acl['allocation']['create'];
+		$this->edit_allow = $this->acl['allocation']['edit'];
+	    $this->view_allow = $this->acl['allocation']['view'];
+	    $this->delete_allow = $this->acl['allocation']['delete'];
+	    $this->show_allow = $this->acl['allocation']['show'];
+	}
+
+	
     public function index()
     {
         $this->log(Auth::user()->id, 'Opened the allocation page.', Request()->path());
@@ -31,6 +47,7 @@ class AllocationController extends Controller
             'finvs' => Inventory::has('allocation',0)->orderby('serial_no')->get(),
             'users' => User::orderby('firstname')->get(),
             'nav' => 'allocation',
+            'create_allow' => $this->create_allow,
             'edit_allow' => $this->edit_allow,
             'delete_allow' => $this->delete_allow,
         ]);
@@ -39,7 +56,7 @@ class AllocationController extends Controller
 
     public function store(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to add an allocation', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -78,7 +95,7 @@ class AllocationController extends Controller
 
 	public function update(Request $r)
 	{
-        if(!in_array(Auth::user()->role->title,$this->edit_allow))
+        if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update an Allocation entry', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -120,7 +137,7 @@ class AllocationController extends Controller
 
 	public function delete(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->delete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete an allocation record', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);

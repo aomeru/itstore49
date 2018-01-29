@@ -11,6 +11,8 @@ use App\Models\Unit;
 use App\Models\Allocation;
 
 use App\Traits\CommonTrait;
+use App\Traits\AclTrait;
+
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Validator;
@@ -20,10 +22,25 @@ use Crypt;
 class UsersController extends Controller
 {
 	use CommonTrait;
+	use AclTrait;
 
-	protected $delete_allow = array('Developer');
-    protected $edit_allow = array('Developer','Administrator');
+	protected $create_allow;
+	protected $edit_allow;
+    protected $view_allow;
+    protected $delete_allow;
+	protected $show_allow;
+	
 
+	public function __construct()
+	{
+		$this->create_allow = $this->acl['user']['create'];
+		$this->edit_allow = $this->acl['user']['edit'];
+	    $this->view_allow = $this->acl['user']['view'];
+	    $this->delete_allow = $this->acl['user']['delete'];
+	    $this->show_allow = $this->acl['user']['show'];
+	}
+
+	
     public function index()
     {
 		$this->log(Auth::user()->id, 'Opened the users page.', Request()->path());
@@ -33,13 +50,23 @@ class UsersController extends Controller
 			'list' => User::orderBy('firstname')->get(),
 			'roles' => Role::orderBy('title')->get(),
 			'units' => Unit::orderBy('title')->get(),
-			'delete_allow' => $this->delete_allow,
+			'create_allow' => $this->create_allow,
+            'edit_allow' => $this->edit_allow,
+            'view_allow' => $this->view_allow,
+            'delete_allow' => $this->delete_allow,
+            'show_allow' => $this->show_allow,
 		]);
     }
 
 
 	public function store(Request $r)
 	{
+
+		if(!in_array(Auth::user()->username,$this->create_allow))
+		{
+			$this->log(Auth::user()->id, 'RESTRICTED! Tried to create a user account', $r->path());
+			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
+		}
 
 		$rules = array(
 			'staff_id' => 'nullable|regex:/^([a-zA-Z0-9-]*)$/|unique:users,staff_id',
@@ -64,7 +91,7 @@ class UsersController extends Controller
 		$user->firstname = ucfirst($r->firstname);
 		$user->lastname = ucfirst($r->lastname);
 		$user->email = $r->email;
-		$e = explode('@',$r->email);
+		if($r->email != null) $e = explode('@',$r->email);
         $user->username = strtolower($e[0]);
 		$user->gender = $r->gender;
 		$user->unit_id = Unit::where('title',$r->unit_id)->value('id');
@@ -77,7 +104,7 @@ class UsersController extends Controller
 
 	public function update(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update a user account', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -86,7 +113,7 @@ class UsersController extends Controller
 		$id = Crypt::decrypt($r->user_id);
 		$user = User::find($id);
 
-		if($user->role->title == 'Developer' && Auth::user()->role->title != 'Developer')
+		if($user->username == 'Developer' && Auth::user()->username != 'Developer')
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to update Developer account', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -116,7 +143,7 @@ class UsersController extends Controller
 		$plastname = $user->lastname;
 		$pemail = $user->email;
 		$pgender = $user->gender;
-		$prole = $user->role->title;
+		$prole = $user->username;
 		$punit = $user->unit == null ? '' : $user->unit->title;
 		$psid = $user->staff_id;
 		$pstatus = $user->status;
@@ -141,7 +168,7 @@ class UsersController extends Controller
 				gender from "'.$pgender.'" to "'.$user->gender.'",
 				account status from "'.$pstatus.'" to "'.$user->status.'",
 				staff ID from "'.$psid.'" to "'.$user->staff_id.'",
-				role from "'.$prole.'" to "'.$user->role->title.'",
+				role from "'.$prole.'" to "'.$user->username.'",
 				unit from "'.$punit.'" to unit with ID "'.$user->unit_id.'",
 				on user id .'.$user->id,
 				$r->path());
@@ -154,7 +181,7 @@ class UsersController extends Controller
 
 	public function delete(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->delete_allow))
+		if(!in_array(Auth::user()->username,$this->delete_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to delete a user account', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -176,7 +203,15 @@ class UsersController extends Controller
 	}
 
 
-	public function show($id) {
+	public function show($id)
+	{
+
+		if(!in_array(Auth::user()->username,$this->show_allow))
+		{
+			$this->log(Auth::user()->id, 'RESTRICTED! Tried to access a user account', Request()->path());
+			$this->ad();
+            return redirect()->back();
+		}
 
 		$id = Crypt::decrypt($id);
 		$user = User::find($id);
@@ -204,7 +239,7 @@ class UsersController extends Controller
 
 	public function resetPassword(Request $r)
 	{
-		if(!in_array(Auth::user()->role->title,$this->edit_allow))
+		if(!in_array(Auth::user()->username,$this->edit_allow))
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to reset a user account password', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);
@@ -215,7 +250,7 @@ class UsersController extends Controller
 
 		if($item == null) return response()->json(array('success' => false, 'errors' => ['errors' => ['This user does not exist.']]), 400);
 
-		if($item->role->title == 'Developer' && Auth::user()->role->title != 'Developer')
+		if($item->username == 'Developer' && Auth::user()->username != 'Developer')
 		{
 			$this->log(Auth::user()->id, 'RESTRICTED! Tried to reset Developer account password', $r->path());
 			return response()->json(array('success' => false, 'errors' => ['errors' => ['WARNING!!! YOU DO NOT HAVE ACCESS TO CARRY OUT THIS PROCESS']]), 400);

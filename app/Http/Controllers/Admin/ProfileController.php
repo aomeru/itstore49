@@ -6,10 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Session;
 use Auth;
-use App\Traits\LogsTrait;
 use App\User;
-use App\Models\UserDetails;
-use App\Models\Pledge;
 use Illuminate\Support\Facades\Validator;
 use Hash;
 

@@ -35,10 +35,18 @@
 									foreach ($i->inventory as $val) {
 										if($val->allocation != null) $allocated += 1;
 									}
+									$l = $inventory - $allocated;
 									?>
-									<p class="no-bottom-margin">Total: {{ $inventory }}</p>
+									<div class="row">
+										<div class="col-6">
+											<p class="no-bottom-margin">Total: {{ $inventory }}</p>
 									<p class="no-bottom-margin">Allocated: {{ $allocated }}</p>
-									<p class="no-bottom-margin">Available: {{ $inventory - $allocated }}</p>
+										</div>
+										<div class="col-6">
+											<p class="no-bottom-margin">Available: {{ $l }}</p>
+											<p class="no-bottom-margin">Reorder?: {!! $l <= config('app.rlevel') ? '<span class="c-f00">Yes</span>' : '<span class="c-fff">No</span>' !!}</p>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>

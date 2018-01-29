@@ -21,12 +21,14 @@
 <div class="card mb50">
 
 	<div class="card-block">
+		@if(in_array(Auth::user()->username,$create_allow))
 		<div class="mb10">
 			<div class="pull-right">
 				<button class="btn btn-primary btn-sm no-margin" title="Add new user" data-toggle="modal" data-target="#add-user-modal"><i class="fa fa-plus"></i></button>
 			</div>
 			<div class="clearfix"></div>
 		</div>
+		@endif
 
 		@if ($list->count() == 0)
 
@@ -60,7 +62,7 @@
 
 						@foreach($list as $item)
 
-							<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-firstname="{{$item->firstname}}" data-lastname="{{$item->lastname}}" data-staff-id="{{$item->staff_id}}" data-role-id="{{$item->role->title}}" data-unit-id="{{$item->unit == null ? '' : $item->unit->title}}" data-gender="{{$item->gender}}" data-email="{{$item->email}}" data-status="{{$item->status}}">
+							<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-firstname="{{$item->firstname}}" data-lastname="{{$item->lastname}}" data-staff-id="{{$item->staff_id}}" data-role-id="{{$item->username}}" data-unit-id="{{$item->unit == null ? '' : $item->unit->title}}" data-gender="{{$item->gender}}" data-email="{{$item->email}}" data-status="{{$item->status}}">
 
 								<td>{{ $row_count }}</td>
 
@@ -72,7 +74,7 @@
 
 								<td><u><a href="{{route('admin.users.show', Crypt::encrypt($item->id))}}" class="c-06f">{{$item->email}}</a></u></td>
 
-								<td>{{$item->role->title}}</td>
+								<td>{{$item->username}}</td>
 
 								<td>{!! $item->unit == null ? '<span class="c-999">N/A</span>' : $item->unit->department->title.' <span class="c-999 v-padding-5">/</span> '.$item->unit->title !!}</td>
 
@@ -86,7 +88,7 @@
 
 									<button class="btn btn-primary btn-sm" title="Edit {{ $item->firstname }}" data-toggle="modal" data-target="#edit-user-modal"><i class="fa fa-pencil"></i></button>
 									<button class="btn btn-primary btn-sm" title="Reset {{ $item->firstname }} password" data-toggle="modal" data-target="#rpass-modal"><i class="fa fa-refresh"></i></button>
-									<button class="btn btn-danger btn-sm" title="Delete {{ $item->firstname }}" data-toggle="modal" data-target="#delete-user-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
+									<button class="btn btn-danger btn-sm" title="Delete {{ $item->firstname }}" data-toggle="modal" data-target="#delete-user-modal" @if(!in_array(Auth::user()->username,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
 
 								</td>
 
@@ -113,7 +115,7 @@
 
 
 @section('page_footer')
-
+@if(in_array(Auth::user()->username,$create_allow))
 	<div class="modal fade" id="add-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w450" role="document">
 			<div class="modal-content">
@@ -209,7 +211,9 @@
 			</div>
 		</div>
 	</div>
+@endif
 
+@if(in_array(Auth::user()->username,$edit_allow))
 	<div class="modal fade" id="edit-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w450" role="document">
 			<div class="modal-content">
@@ -325,32 +329,6 @@
 		</div>
 	</div>
 
-	<div class="modal fade" id="delete-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-
-					<div class="modal-body">
-
-						<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-title" class="c-06f"></span>" user account?</p>
-
-					</div>
-
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<input type="hidden" id="user-row-id-delete">
-								<input type="hidden" id="user-id-delete">
-								<button class="btn-danger btn btn-block" id='delete-user-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
-							</div>
-						</div>
-					</div>
-			</div>
-		</div>
-	</div>
-
 	<div class="modal fade" id="rpass-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
 			<div class="modal-content">
@@ -376,6 +354,36 @@
 			</div>
 		</div>
 	</div>
+@endif
+
+@if(in_array(Auth::user()->username,$delete_allow))
+	<div class="modal fade" id="delete-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog w300" role="document">
+			<div class="modal-content">
+
+					<div class="modal-body">
+
+						<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-title" class="c-06f"></span>" user account?</p>
+
+					</div>
+
+					<div class="modal-footer mh-override">
+						<div class="row">
+							<div class="col-6">
+								<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+							</div>
+							<div class="col-6">
+								<input type="hidden" id="user-row-id-delete">
+								<input type="hidden" id="user-id-delete">
+								<button class="btn-danger btn btn-block" id='delete-user-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+@endif
+
 
 @endsection
 

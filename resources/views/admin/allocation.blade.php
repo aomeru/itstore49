@@ -35,7 +35,9 @@
 										<div class="tools pull-sm-right"></div>
 									</div>
 									<div class="col-6 text-right">
+										@if(in_array(Auth::user()->username,$create_allow))
 										<button class="btn btn-primary btn-sm no-margin" title="Add new allocation" data-toggle="modal" data-target="#add-all-modal"><i class="fa fa-plus"></i></button>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -53,7 +55,7 @@
 									<th class="text-center">Approval</th>
 									<th>Added By</th>
 									<th>Date</th>
-									@if(in_array(Auth::user()->role->title,$edit_allow))
+									@if(in_array(Auth::user()->username,$edit_allow))
 										<th class="text-center">Actions</th>
 									@endif
 								</tr>
@@ -85,10 +87,10 @@
 										<td>{{ $item->allocated->firstname.' '.$item->allocated->lastname }}</td>
 										<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
 
-										@if(in_array(Auth::user()->role->title,$edit_allow))
+										@if(in_array(Auth::user()->username,$edit_allow))
 											<td class="text-center">
 												<button class="btn btn-primary btn-sm" title="Edit #{{ $item->id }} allocation entry" data-toggle="modal" data-target="#edit-all-modal"><i class="fa fa-pencil"></i></button>
-												<button class="btn btn-danger btn-sm" title="Delete #{{ $item->id }} allocation entry" data-toggle="modal" data-target="#delete-all-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
+												<button class="btn btn-danger btn-sm" title="Delete #{{ $item->id }} allocation entry" data-toggle="modal" data-target="#delete-all-modal" @if(!in_array(Auth::user()->username,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
 											</td>
 										@endif
 
@@ -119,6 +121,8 @@
 
 
 @section('page_footer')
+
+	@if(in_array(Auth::user()->username,$create_allow))
 
 	<div class="modal fade" id="add-all-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
@@ -181,6 +185,11 @@
 		</div>
 	</div>
 
+	@endif
+
+
+	@if(in_array(Auth::user()->username,$edit_allow))
+
 	<div class="modal fade" id="edit-all-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
 			<div class="modal-content">
@@ -237,6 +246,11 @@
 		</div>
 	</div>
 
+	@endif
+
+
+	@if(in_array(Auth::user()->username,$delete_allow))
+
 	<div class="modal fade" id="delete-all-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
 			<div class="modal-content">
@@ -262,6 +276,8 @@
 			</div>
 		</div>
 	</div>
+
+	@endif
 
 @endsection
 

@@ -38,7 +38,7 @@
 							<th>User</th>
 							<th>Page</th>
 							<th>Log</th>
-							<th>Created</th>
+							<th>Logged</th>
 						</tr>
 					</thead>
 
@@ -54,7 +54,13 @@
 
 								<td><u><a href="{{route('admin.users.show', Crypt::encrypt($item->user_id))}}" class="c-06f">{{$item->user->firstname.' '.$item->user->lastname}}</a></u></td>
 
-								<td>{{$item->page_url}}</td>
+								<td>
+									<?php
+									$i = $item->page_url;
+									$i = strlen($i) > 20 ? substr($i,0,20).'...' : $i;
+									?>
+									{{$i}}
+								</td>
 
 								<td style="word-wrap: inherit !important">{{$item->descrip}}</td>
 

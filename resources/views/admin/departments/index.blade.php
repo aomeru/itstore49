@@ -25,12 +25,14 @@
 				</div>
 
 				<div class="card-block">
+					@if(in_array(Auth::user()->username,$dcreate_allow))
 					<div class="mb10">
 						<div class="pull-right">
 							<button class="btn btn-primary btn-sm no-margin" title="Add new department" data-toggle="modal" data-target="#add-dept-modal"><i class="fa fa-plus"></i></button>
 						</div>
 						<div class="clearfix"></div>
 					</div>
+					@endif
 
 					@if ($depts->count() == 0)
 						<p class="alert alert-info">No department record found.</p>
@@ -74,7 +76,7 @@
 											</td>
 											<td class="text-center">
 												<button class="edit-dept-btn btn btn-primary btn-sm" title="Edit {{ $item->title }}" data-toggle="modal" data-target="#edit-dept-modal"><i class="fa fa-pencil"></i></button>
-												<button class="btn btn-danger btn-sm" title="Delete {{ $item->title }}" data-toggle="modal" data-target="#delete-dept-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
+												<button class="btn btn-danger btn-sm" title="Delete {{ $item->title }}" data-toggle="modal" data-target="#delete-dept-modal" @if(!in_array(Auth::user()->username,$ddelete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
 											</td>
 										</tr>
 
@@ -102,12 +104,14 @@
 				</div>
 
 				<div class="card-block">
+					@if(in_array(Auth::user()->username,$ucreate_allow))
 					<div class="mb10">
 						<div class="pull-right">
 							<button class="btn btn-primary btn-sm no-margin" title="Add new sub unit" data-toggle="modal" data-target="#add-unit-modal"><i class="fa fa-plus"></i></button>
 						</div>
 						<div class="clearfix"></div>
 					</div>
+					@endif
 
 					@if ($units->count() == 0)
 						<p class="alert alert-info">No sub unit record found.</p>
@@ -140,7 +144,7 @@
 											<td class="text-center">{{ $unit->users->count() }}</td>
 											<td class="text-center">
 												<button class="btn btn-primary btn-sm" title="Edit {{ $unit->title }}" data-toggle="modal" data-target="#edit-unit-modal"><i class="fa fa-pencil"></i></button>
-												<button class="btn btn-danger btn-sm" title="Delete {{ $unit->title }}" data-toggle="modal" data-target="#delete-unit-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
+												<button class="btn btn-danger btn-sm" title="Delete {{ $unit->title }}" data-toggle="modal" data-target="#delete-unit-modal" @if(!in_array(Auth::user()->username,$udelete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
 											</td>
 										</tr>
 
@@ -169,214 +173,224 @@
 
 @section('page_footer')
 
-	<div class="modal fade" id="add-dept-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+@if(in_array(Auth::user()->username,$dcreate_allow))
+<div class="modal fade" id="add-dept-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
+			<form method="post">
 
-				    <div class="modal-header mh-override">
-	                    <h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Department</h4>
-				    </div>
+				<div class="modal-header mh-override">
+					<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Department</h4>
+				</div>
 
-					<div class="modal-body">
-	                    <div class="form-group input_field_sections">
-	                        <label for="dept_name" class="form-control-label text-center">Department Name</label>
+				<div class="modal-body">
+					<div class="form-group input_field_sections">
+						<label for="dept_name" class="form-control-label text-center">Department Name</label>
 
-							<input type="text" name="dept_name" id="dept_name" class="form-control" value="{{ Request::old('dept_name') }}" placeholder="Enter departmental title" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
-	                    </div>
+						<input type="text" name="dept_name" id="dept_name" class="form-control" value="{{ Request::old('dept_name') }}" placeholder="Enter departmental title" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
 					</div>
+				</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<button class="btn-success btn btn-block" id='add-dept-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
-							</div>
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<button class="btn-success btn btn-block" id='add-dept-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
 						</div>
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
+@endif
 
-	<div class="modal fade" id="delete-dept-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
+@if(in_array(Auth::user()->username,$ddelete_allow))
+<div class="modal fade" id="delete-dept-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
 
-					<div class="modal-body">
+				<div class="modal-body">
 
-						<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-title" class="c-06f"></span>" department?</p>
+					<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-title" class="c-06f"></span>" department?</p>
 
-					</div>
+				</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<input type="hidden" id="dept-row-id-delete">
-								<input type="hidden" id="dept-id-delete">
-								<button class="btn-danger btn btn-block" id='delete-dept-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
-							</div>
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<input type="hidden" id="dept-row-id-delete">
+							<input type="hidden" id="dept-id-delete">
+							<button class="btn-danger btn btn-block" id='delete-dept-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
 						</div>
 					</div>
-			</div>
+				</div>
 		</div>
 	</div>
+</div>
+@endif
 
-	<div class="modal fade" id="edit-dept-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+@if(in_array(Auth::user()->username,$dedit_allow))
+<div class="modal fade" id="edit-dept-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
+			<form method="post">
 
-					<div class="modal-header mh-override">
-						<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Department</h4>
+				<div class="modal-header mh-override">
+					<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Department</h4>
+				</div>
+
+				<div class="modal-body">
+					<div class="form-group input_field_sections">
+						<label for="dept-name-edit" class="form-control-label text-center">Department Name</label>
+
+						<input type="text" id="dept-name-edit" class="form-control" placeholder="Enter departmental title" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
 					</div>
+				</div>
 
-					<div class="modal-body">
-						<div class="form-group input_field_sections">
-							<label for="dept-name-edit" class="form-control-label text-center">Department Name</label>
-
-							<input type="text" id="dept-name-edit" class="form-control" placeholder="Enter departmental title" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<input type="hidden" id="dept-row-id">
+							<input type="hidden" id="dept-id-edit">
+							<button class="btn-success btn btn-block" id='update-dept-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
 						</div>
 					</div>
-
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<input type="hidden" id="dept-row-id">
-								<input type="hidden" id="dept-id-edit">
-								<button class="btn-success btn btn-block" id='update-dept-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
-							</div>
-						</div>
-					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
+@endif
 
 
+@if(in_array(Auth::user()->username,$ucreate_allow))
+<div class="modal fade" id="add-unit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
+			<form method="post">
 
+				<div class="modal-header mh-override">
+					<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Sub Unit</h4>
+				</div>
 
-	<div class="modal fade" id="add-unit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+				<div class="modal-body">
+					<div class="form-group input_field_sections">
+						<label for="unit-name" class="form-control-label text-center">Unit Name</label>
 
-				    <div class="modal-header mh-override">
-	                    <h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Sub Unit</h4>
-				    </div>
-
-					<div class="modal-body">
-	                    <div class="form-group input_field_sections">
-	                        <label for="unit-name" class="form-control-label text-center">Unit Name</label>
-
-							<input type="text" id="unit-name" class="form-control" placeholder="Enter sub unit name" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
-	                    </div>
-
-						<div class="form-group input_field_sections">
-	                        <label for="unit-dept-id" class="form-control-label text-center">Department Name</label>
-
-							<select id="unit-dept-id" class="form-control chzn-select">
-								<option value="">Select Department</option>
-								@foreach($depts as $dept)
-									<option value="{{Crypt::encrypt($dept->id)}}">{{$dept->title}}</option>
-								@endforeach
-							</select>
-	                    </div>
+						<input type="text" id="unit-name" class="form-control" placeholder="Enter sub unit name" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
 					</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<button class="btn-success btn btn-block" id='add-unit-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
-							</div>
+					<div class="form-group input_field_sections">
+						<label for="unit-dept-id" class="form-control-label text-center">Department Name</label>
+
+						<select id="unit-dept-id" class="form-control chzn-select">
+							<option value="">Select Department</option>
+							@foreach($depts as $dept)
+								<option value="{{Crypt::encrypt($dept->id)}}">{{$dept->title}}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<button class="btn-success btn btn-block" id='add-unit-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
 						</div>
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
+@endif
 
-	<div class="modal fade" id="edit-unit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+@if(in_array(Auth::user()->username,$uedit_allow))
+<div class="modal fade" id="edit-unit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
+			<form method="post">
 
-				    <div class="modal-header mh-override">
-	                    <h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Sub Unit</h4>
-				    </div>
+				<div class="modal-header mh-override">
+					<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Sub Unit</h4>
+				</div>
 
-					<div class="modal-body">
-	                    <div class="form-group input_field_sections">
-	                        <label for="unit-name-edit" class="form-control-label text-center">Unit Name</label>
+				<div class="modal-body">
+					<div class="form-group input_field_sections">
+						<label for="unit-name-edit" class="form-control-label text-center">Unit Name</label>
 
-							<input type="text" id="unit-name-edit" class="form-control" placeholder="Enter sub unit name" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
-	                    </div>
-
-						<div class="form-group inputt_field_sections">
-	                        <label for="unit-dept-title-edit" class="form-control-label text-center">Department Name</label>
-
-							<select id="unit-dept-title-edit" class="form-control chznn-select">
-								<option value="">Select Department</option>
-								@foreach($depts as $dept)
-									<option value="{{$dept->title}}">{{$dept->title}}</option>
-								@endforeach
-							</select>
-	                    </div>
+						<input type="text" id="unit-name-edit" class="form-control" placeholder="Enter sub unit name" data-validation="custom required" data-validation-regexp="^([a-zA-Z&' ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces and &amp;">
 					</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<input type="hidden" id="unit-row-id">
-								<input type="hidden" id="unit-id-edit">
-								<button class="btn-success btn btn-block" id='update-unit-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
-							</div>
+					<div class="form-group inputt_field_sections">
+						<label for="unit-dept-title-edit" class="form-control-label text-center">Department Name</label>
+
+						<select id="unit-dept-title-edit" class="form-control chznn-select">
+							<option value="">Select Department</option>
+							@foreach($depts as $dept)
+								<option value="{{$dept->title}}">{{$dept->title}}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<input type="hidden" id="unit-row-id">
+							<input type="hidden" id="unit-id-edit">
+							<button class="btn-success btn btn-block" id='update-unit-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
 						</div>
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
+@endif
 
-	<div class="modal fade" id="delete-unit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
+@if(in_array(Auth::user()->username,$udelete_allow))
+<div class="modal fade" id="delete-unit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
 
-					<div class="modal-body">
+				<div class="modal-body">
 
-						<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-unit-title" class="c-06f"></span>" unit?</p>
+					<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-unit-title" class="c-06f"></span>" unit?</p>
 
-					</div>
+				</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<input type="hidden" id="unit-row-id-delete">
-								<input type="hidden" id="unit-id-delete">
-								<button class="btn-danger btn btn-block" id='delete-unit-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
-							</div>
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<input type="hidden" id="unit-row-id-delete">
+							<input type="hidden" id="unit-id-delete">
+							<button class="btn-danger btn btn-block" id='delete-unit-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
 						</div>
 					</div>
-			</div>
+				</div>
 		</div>
 	</div>
+</div>
+@endif
 
 
 

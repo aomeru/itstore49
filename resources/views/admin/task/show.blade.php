@@ -159,7 +159,7 @@
 
 
 @section('page_footer')
-
+@if(in_array(Auth::user()->username,$create_allow))
 	<div class="modal fade" id="add-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w450" role="document">
 			<div class="modal-content">
@@ -202,7 +202,9 @@
 			</div>
 		</div>
 	</div>
+@endif
 
+@if(in_array(Auth::user()->username,$delete_allow))
 	<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
 			<div class="modal-content">
@@ -228,7 +230,9 @@
 			</div>
 		</div>
 	</div>
+@endif
 
+@if(in_array(Auth::user()->username,$edit_allow))
 	<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w450" role="document">
 			<div class="modal-content">
@@ -273,6 +277,8 @@
 			</div>
 		</div>
 	</div>
+@endif
+
 
 @endsection
 

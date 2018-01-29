@@ -152,6 +152,8 @@
 
 @section('page_footer')
 
+	@if(in_array(Auth::user()->username,$delete_allow))
+
 	<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
 			<div class="modal-content">
@@ -177,6 +179,8 @@
 			</div>
 		</div>
 	</div>
+
+	@endif
 
 @endsection
 

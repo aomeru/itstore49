@@ -12,7 +12,7 @@ trait AclTrait
 {
 
 	protected $acl = [
-		'itsupportocation' => [
+		'allocation' => [
 			'create' => ['itsupport','enta'],
 			'edit' => ['itsupport','enta'],
 			'view' => ['itsupport'],
@@ -20,18 +20,18 @@ trait AclTrait
 			'show' => [],
 		],
 		'comment' => [
-			'create' => [],
-			'edit' => [],
-			'view' => [],
-			'delete' => [],
-			'show' => [],
+			'create' => ['itsupport'],
+			'edit' => ['itsupport'],
+			'view' => ['itsupport'],
+			'delete' => ['itsupport'],
+			'show' => ['itsupport'],
 		],
 		'department' => [
-			'create' => [],
-			'edit' => [],
-			'view' => [],
-			'delete' => [],
-			'show' => [],
+			'create' => ['itsupport'],
+			'edit' => ['itsupport'],
+			'view' => ['itsupport'],
+			'delete' => ['itsupport'],
+			'show' => ['itsupport'],
 		],
 		'ilog' => [
 			'create' => ['itsupport','enta','cukaigwe'],
@@ -48,18 +48,18 @@ trait AclTrait
 			'show' => ['itsupport'],
 		],
 		'item' => [
-			'create' => [],
-			'edit' => [],
-			'view' => [],
-			'delete' => [],
-			'show' => [],
+			'create' => ['itsupport'],
+			'edit' => ['itsupport'],
+			'view' => ['itsupport'],
+			'delete' => ['itsupport'],
+			'show' => ['itsupport'],
 		],
 		'log' => [
-			'create' => [],
-			'edit' => [],
-			'view' => [],
-			'delete' => [],
-			'show' => [],
+			'create' => ['itsupport'],
+			'edit' => ['itsupport'],
+			'view' => ['itsupport'],
+			'delete' => ['itsupport'],
+			'show' => ['itsupport'],
 		],
 		'plog' => [
 			'create' => ['itsupport'],
@@ -76,18 +76,25 @@ trait AclTrait
 			'show' => ['itsupport'],
 		],
 		'task' => [
-			'create' => [],
-			'edit' => [],
-			'view' => [],
-			'delete' => [],
-			'show' => [],
+			'create' => ['itsupport'],
+			'edit' => ['itsupport'],
+			'view' => ['itsupport'],
+			'delete' => ['itsupport'],
+			'show' => ['itsupport'],
 		],
 		'unit' => [
-			'create' => [],
-			'edit' => [],
-			'view' => [],
-			'delete' => [],
-			'show' => [],
+			'create' => ['itsupport'],
+			'edit' => ['itsupport'],
+			'view' => ['itsupport'],
+			'delete' => ['itsupport'],
+			'show' => ['itsupport'],
+		],
+		'user' => [
+			'create' => ['itsupport'],
+			'edit' => ['itsupport'],
+			'view' => ['itsupport'],
+			'delete' => ['itsupport'],
+			'show' => ['itsupport'],
 		],
 	];
 

@@ -23,12 +23,14 @@
 	<div class="card">
 
 		<div class="card-block">
+			@if(in_array(Auth::user()->username,$create_allow))
 			<div class="mb10">
 				<div class="pull-right">
 					<button class="btn btn-primary btn-sm no-margin" title="Add new department" data-toggle="modal" data-target="#add-item-modal"><i class="fa fa-plus"></i></button>
 				</div>
 				<div class="clearfix"></div>
 			</div>
+			@endif
 
 			@if ($list->count() == 0)
 				<p class="alert alert-info">No item record found.</p>
@@ -48,13 +50,13 @@
 								<th class="text-center">Total</th>
 								<th class="text-center" title="Allocated / Available">Al/Av</th>
 								<th class="text-center" title="Reorder?">Reorder</th>
-								@if(in_array(Auth::user()->role->title,$delete_allow))
+								@if(in_array(Auth::user()->username,$delete_allow))
 									<th>Added by</th>
 									<th>Created</th>
 									<th>Updated</th>
 								@endif
 
-								@if(in_array(Auth::user()->role->title,$delete_allow) || in_array(Auth::user()->role->title,$edit_allow))
+								@if(in_array(Auth::user()->username,$delete_allow) || in_array(Auth::user()->username,$edit_allow))
 									<th class="text-center">Actions</th>
 								@endif
 							</tr>
@@ -87,16 +89,16 @@
 									<td class="text-center">
 										{!! $avail <= config('app.rlevel') ? '<span class="c-f00">Yes</span>' : '<span class="c-090">No</span>' !!}
 									</td>
-									@if(in_array(Auth::user()->role->title,$delete_allow))
+									@if(in_array(Auth::user()->username,$delete_allow))
 										<td>{{$item->user->firstname.' '.$item->user->lastname}}</td>
 										<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
 										<td>{{date('d-m-y, g:ia', strtotime($item->updated_at))}}</td>
 									@endif
 
-									@if(in_array(Auth::user()->role->title,$delete_allow) || in_array(Auth::user()->role->title,$edit_allow))
+									@if(in_array(Auth::user()->username,$delete_allow) || in_array(Auth::user()->username,$edit_allow))
 										<td class="text-center">
 											<button class="btn btn-primary btn-sm" title="Edit {{ $item->title }}" data-toggle="modal" data-target="#edit-item-modal"><i class="fa fa-pencil"></i></button>
-											<button class="btn btn-danger btn-sm" title="Delete {{ $item->title }}" data-toggle="modal" data-target="#delete-item-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
+											<button class="btn btn-danger btn-sm" title="Delete {{ $item->title }}" data-toggle="modal" data-target="#delete-item-modal" @if(!in_array(Auth::user()->username,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
 										</td>
 									@endif
 
@@ -124,155 +126,161 @@
 
 @section('page_footer')
 
-	<div class="modal fade" id="add-item-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+@if(in_array(Auth::user()->username,$create_allow))
+<div class="modal fade" id="add-item-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
+			<form method="post">
 
-				    <div class="modal-header mh-override">
-	                    <h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Item</h4>
-				    </div>
+				<div class="modal-header mh-override">
+					<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Add Item</h4>
+				</div>
 
-					<div class="modal-body">
-	                    <div class="form-group input_field_sections">
-	                        <label for="item-name" class="form-control-label text-center sr-only">Name</label>
+				<div class="modal-body">
+					<div class="form-group input_field_sections">
+						<label for="item-name" class="form-control-label text-center sr-only">Name</label>
 
-							<input type="text" id="item-name" class="form-control" placeholder="Enter item title" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&'- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces, hypen, apostrophe  and &amp;">
-	                    </div>
-
-						<div class="form-group input_field_sections">
-	                        <label for="item-type" class="form-control-label text-center sr-only">Type</label>
-
-							<select id="item-type" class="form-control chzn-select">
-								<option value="">Select Type</option>
-								@foreach($item_types as $item_type)
-									<option value="{{$item_type}}">{{$item_type}}</option>
-								@endforeach
-							</select>
-	                    </div>
-
-						<div class="form-group input_field_sections">
-	                        <label for="item-processor" class="form-control-label text-center sr-only">Processor</label>
-
-							<select id="item-processor" class="form-control chzn-select">
-								<option value="">Select Processor</option>
-								@foreach($item_processor as $item_pro)
-									<option value="{{$item_pro}}">{{$item_pro}}</option>
-								@endforeach
-							</select>
-	                    </div>
-
-						<div class="form-group input_field_sections">
-	                        <label for="item-descrip" class="form-control-label text-center sr-only">Description</label>
-
-							<textarea id="item-descrip" class="form-control" maxlength="150" placeholder="Item description"></textarea>
-	                    </div>
+						<input type="text" id="item-name" class="form-control" placeholder="Enter item title" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&'- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces, hypen, apostrophe  and &amp;">
 					</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<button class="btn-success btn btn-block" id='add-item-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
-							</div>
+					<div class="form-group input_field_sections">
+						<label for="item-type" class="form-control-label text-center sr-only">Type</label>
+
+						<select id="item-type" class="form-control chzn-select">
+							<option value="">Select Type</option>
+							@foreach($item_types as $item_type)
+								<option value="{{$item_type}}">{{$item_type}}</option>
+							@endforeach
+						</select>
+					</div>
+
+					<div class="form-group input_field_sections">
+						<label for="item-processor" class="form-control-label text-center sr-only">Processor</label>
+
+						<select id="item-processor" class="form-control chzn-select">
+							<option value="">Select Processor</option>
+							@foreach($item_processor as $item_pro)
+								<option value="{{$item_pro}}">{{$item_pro}}</option>
+							@endforeach
+						</select>
+					</div>
+
+					<div class="form-group input_field_sections">
+						<label for="item-descrip" class="form-control-label text-center sr-only">Description</label>
+
+						<textarea id="item-descrip" class="form-control" maxlength="150" placeholder="Item description"></textarea>
+					</div>
+				</div>
+
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<button class="btn-success btn btn-block" id='add-item-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Add</button>
 						</div>
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
+@endif
 
-	<div class="modal fade" id="edit-item-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
-				<form method="post">
+@if(in_array(Auth::user()->username,$edit_allow))
+<div class="modal fade" id="edit-item-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
+			<form method="post">
 
-					<div class="modal-header mh-override">
-						<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Item</h4>
+				<div class="modal-header mh-override">
+					<h4 class="modal-title no-padding no-margin text-uppercase font-600 text-center c-070">Edit Item</h4>
+				</div>
+
+				<div class="modal-body">
+
+					<div class="form-group input_field_sections">
+						<label for="item-name-edit" class="form-control-label text-center sr-only">Name</label>
+
+						<input type="text" id="item-name-edit" class="form-control" placeholder="Enter item title" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&'- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces, hypen, apostrophe  and &amp;">
 					</div>
 
-					<div class="modal-body">
+					<div class="form-group input_field_sectionss">
+						<label for="item-type-edit" class="form-control-label text-center sr-only">Type</label>
 
-						<div class="form-group input_field_sections">
-	                        <label for="item-name-edit" class="form-control-label text-center sr-only">Name</label>
-
-							<input type="text" id="item-name-edit" class="form-control" placeholder="Enter item title" data-validation="custom required" data-validation-regexp="^([a-zA-Z0-9&'- ]+)$" data-validation-error-msg="Please use aplhanumeric characters only, with spaces, hypen, apostrophe  and &amp;">
-	                    </div>
-
-						<div class="form-group input_field_sectionss">
-	                        <label for="item-type-edit" class="form-control-label text-center sr-only">Type</label>
-
-							<select id="item-type-edit" class="form-control chzn-selectt">
-								<option value="">Select Type</option>
-								@foreach($item_types as $item_type)
-									<option value="{{$item_type}}">{{$item_type}}</option>
-								@endforeach
-							</select>
-	                    </div>
-
-						<div class="form-group input_field_sectionss">
-	                        <label for="item-processor-edit" class="form-control-label text-center sr-only">Processor</label>
-
-							<select id="item-processor-edit" class="form-control chzn-selectt">
-								<option value="">Select Processor</option>
-								@foreach($item_processor as $item_pro)
-									<option value="{{$item_pro}}">{{$item_pro}}</option>
-								@endforeach
-							</select>
-	                    </div>
-
-						<div class="form-group input_field_sections">
-	                        <label for="item-descrip-edit" class="form-control-label text-center sr-only">Description</label>
-
-							<textarea id="item-descrip-edit" class="form-control" maxlength="150" placeholder="Item description"></textarea>
-	                    </div>
-
+						<select id="item-type-edit" class="form-control chzn-selectt">
+							<option value="">Select Type</option>
+							@foreach($item_types as $item_type)
+								<option value="{{$item_type}}">{{$item_type}}</option>
+							@endforeach
+						</select>
 					</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<input type="hidden" id="item-row-id">
-								<input type="hidden" id="item-id-edit">
-								<button class="btn-success btn btn-block" id='update-item-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
-							</div>
+					<div class="form-group input_field_sectionss">
+						<label for="item-processor-edit" class="form-control-label text-center sr-only">Processor</label>
+
+						<select id="item-processor-edit" class="form-control chzn-selectt">
+							<option value="">Select Processor</option>
+							@foreach($item_processor as $item_pro)
+								<option value="{{$item_pro}}">{{$item_pro}}</option>
+							@endforeach
+						</select>
+					</div>
+
+					<div class="form-group input_field_sections">
+						<label for="item-descrip-edit" class="form-control-label text-center sr-only">Description</label>
+
+						<textarea id="item-descrip-edit" class="form-control" maxlength="150" placeholder="Item description"></textarea>
+					</div>
+
+				</div>
+
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-default btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<input type="hidden" id="item-row-id">
+							<input type="hidden" id="item-id-edit">
+							<button class="btn-success btn btn-block" id='update-item-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Update</button>
 						</div>
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
+@endif
 
-	<div class="modal fade" id="delete-item-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog w300" role="document">
-			<div class="modal-content">
+@if(in_array(Auth::user()->username,$delete_allow))
+<div class="modal fade" id="delete-item-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog w300" role="document">
+		<div class="modal-content">
 
-					<div class="modal-body">
+				<div class="modal-body">
 
-						<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-title" class="c-06f"></span>" item?</p>
+					<p class="text-center font-18x no-bottom-margin">Are you sure you want to delete "<span id="delete-title" class="c-06f"></span>" item?</p>
 
-					</div>
+				</div>
 
-					<div class="modal-footer mh-override">
-						<div class="row">
-							<div class="col-6">
-								<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
-							</div>
-							<div class="col-6">
-								<input type="hidden" id="item-row-id-delete">
-								<input type="hidden" id="item-id-delete">
-								<button class="btn-danger btn btn-block" id='delete-item-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
-							</div>
+				<div class="modal-footer mh-override">
+					<div class="row">
+						<div class="col-6">
+							<button type="button" class="btn-primary btn btn-block" data-dismiss="modal" aria-label="Close"><i class="fa fa-times mr5"></i>Cancel</button>
+						</div>
+						<div class="col-6">
+							<input type="hidden" id="item-row-id-delete">
+							<input type="hidden" id="item-id-delete">
+							<button class="btn-danger btn btn-block" id='delete-item-btn' type="submit" role="button"><i class="fa fa-check mr5"></i>Delete</button>
 						</div>
 					</div>
-			</div>
+				</div>
 		</div>
 	</div>
+</div>
+@endif
 
 @endsection
 

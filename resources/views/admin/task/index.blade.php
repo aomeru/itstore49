@@ -21,7 +21,7 @@
 <div class="card mb50">
 
 	<div class="card-block">
-		@if(in_array(Auth::user()->role->title,$edit_allow))
+		@if(in_array(Auth::user()->username,$edit_allow))
 			<div class="mb10">
 				<div class="pull-right">
 					<button class="btn btn-primary btn-sm no-margin" title="Assign new task" data-toggle="modal" data-target="#add-modal"><i class="fa fa-plus"></i></button>
@@ -52,7 +52,7 @@
 							<th>Owner</th>
 							<th>Status</th>
 							<th>Created</th>
-							@if(in_array(Auth::user()->role->title,$edit_allow)) <th class="text-right">Actions</th> @endif
+							@if(in_array(Auth::user()->username,$edit_allow)) <th class="text-right">Actions</th> @endif
 						</tr>
 					</thead>
 
@@ -73,7 +73,7 @@
 								<td>{{$item->type}}</td>
 
 								<td>
-									@if(in_array(Auth::user()->role->title, $edit_allow)) <u><a href="{{route('admin.users.show', Crypt::encrypt($item->client_id))}}" class="c-06f">{{$item->client->firstname.' '.$item->client->lastname}}</a></u> @else {{$item->client->firstname.' '.$item->client->lastname}} @endif
+									@if(in_array(Auth::user()->username, $edit_allow)) <u><a href="{{route('admin.users.show', Crypt::encrypt($item->client_id))}}" class="c-06f">{{$item->client->firstname.' '.$item->client->lastname}}</a></u> @else {{$item->client->firstname.' '.$item->client->lastname}} @endif
 								</td>
 
 								<td>
@@ -100,12 +100,12 @@
 
 								<td>{{date('d-m-y, g:ia', strtotime($item->created_at))}}</td>
 
-								@if(in_array(Auth::user()->role->title,$edit_allow))
+								@if(in_array(Auth::user()->username,$edit_allow))
 									<td class="text-right">
 
 										<button class="btn btn-primary btn-sm" title="Edit {{ $item->title }} task" data-toggle="modal" data-target="#edit-modal"><i class="fa fa-pencil"></i></button>
 										<button class="btn btn-default btn-sm" title="Reassign {{ $item->title }} task" data-toggle="modal" data-target="#rass-modal"><i class="fa fa-refresh"></i></button>
-										<button class="btn btn-danger btn-sm" title="Delete {{ $item->title }} task" data-toggle="modal" data-target="#delete-modal" @if(!in_array(Auth::user()->role->title,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
+										<button class="btn btn-danger btn-sm" title="Delete {{ $item->title }} task" data-toggle="modal" data-target="#delete-modal" @if(!in_array(Auth::user()->username,$delete_allow)) disabled @endif><i class="fa fa-trash"></i></button>
 
 									</td>
 								@endif
@@ -133,7 +133,7 @@
 
 
 @section('page_footer')
-
+@if(in_array(Auth::user()->username,$create_allow))
 	<div class="modal fade" id="add-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w450" role="document">
 			<div class="modal-content">
@@ -230,7 +230,9 @@
 			</div>
 		</div>
 	</div>
+@endif
 
+@if(in_array(Auth::user()->username,$edit_allow))
 	<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w450" role="document">
 			<div class="modal-content">
@@ -358,7 +360,9 @@
 			</div>
 		</div>
 	</div>
+@endif
 
+@if(in_array(Auth::user()->username,$delete_allow))
 	<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		<div class="modal-dialog w300" role="document">
 			<div class="modal-content">
@@ -384,6 +388,7 @@
 			</div>
 		</div>
 	</div>
+@endif
 
 @endsection
 

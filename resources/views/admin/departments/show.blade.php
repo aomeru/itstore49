@@ -186,7 +186,7 @@
 									<td>{{$item->type}}</td>
 
 									<td>
-										@if(in_array(Auth::user()->role->title, $edit_allow)) <u><a href="{{route('admin.users.show', Crypt::encrypt($item->client_id))}}" class="c-06f">{{$item->client->firstname.' '.$item->client->lastname}}</a></u> @else {{$item->client->firstname.' '.$item->client->lastname}} @endif
+										@if(in_array(Auth::user()->username, $edit_allow)) <u><a href="{{route('admin.users.show', Crypt::encrypt($item->client_id))}}" class="c-06f">{{$item->client->firstname.' '.$item->client->lastname}}</a></u> @else {{$item->client->firstname.' '.$item->client->lastname}} @endif
 									</td>
 
 									<td>
