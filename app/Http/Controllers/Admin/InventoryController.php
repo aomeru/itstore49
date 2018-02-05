@@ -101,7 +101,7 @@ class InventoryController extends Controller
 		$item = new Inventory();
 		$item->serial_no = strtoupper($r->serial_no);
 		$item->item_id = Item::where('title',$r->item_type)->value('id');
-		if($po != null) $item->purchase_id = $po->id;
+		if($r->item_po != null) $item->purchase_id = $po->id;
 		$item->user_id = Auth::user()->id;
 
 		if($item->save()) { $this->log(Auth::user()->id, 'Added inventory with serial number "'.$item->serial_no.'" and id .'.$item->id, $r->path()); return response()->json(array('success' => true, 'message' => 'Inventory Added'), 200);}
