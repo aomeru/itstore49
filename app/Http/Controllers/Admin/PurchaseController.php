@@ -94,7 +94,7 @@ class PurchaseController extends Controller
         }
 
        $this->validate($r, [
-			'po_title' => 'required',
+			'po_title' => 'required|unique:purchases,title',
 			'po_total' => 'nullable|numeric',
 			'po_pofile' => 'nullable|mimes:pdf',
 			'po_dnfile' => 'nullable|mimes:pdf',
@@ -188,7 +188,7 @@ class PurchaseController extends Controller
         }
 
         $this->validate($r, [
-			'po_title' => 'required',
+			'po_title' => 'required|unique:purchases,title',
 			'po_total' => 'nullable|numeric',
 			'po_pofile' => 'nullable|mimes:pdf',
 			'po_dnfile' => 'nullable|mimes:pdf',

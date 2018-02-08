@@ -105,7 +105,7 @@
 
 							@foreach($invs as $item)
 
-								<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-purchase-id="{{$item->purchase_id}}" data-item-type="{{$item->item->title}}" data-serial-no="{{$item->serial_no}}">
+								<tr id="row-{{$item->id}}" data-hrid="{{$item->id}}" data-id="{{Crypt::encrypt($item->id)}}" data-purchase-title="{{$item->purchase == null ? '' : $item->purchase->title}}" data-item-type="{{$item->item->title}}" data-serial-no="{{$item->serial_no}}">
 									<td>
 										<u><a href="{{route('admin.inv.show', Crypt::encrypt($item->id))}}" class="c-06f">{{ $item->serial_no }}</a></u>
 									</td>
@@ -179,12 +179,12 @@
 							</div>
 
 							<div class="form-group input_field_sections">
-								<label for="item-po" class="form-control-label text-center sr-only">Purchase Order</label>
+								<label for="purchase-title" class="form-control-label text-center sr-only">Purchase Order</label>
 
-								<select id="item-po" class="form-control chzn-select">
+								<select id="purchase-title" class="form-control chzn-select">
 									<option value="">Select Purchase Order</option>
 									@foreach($po as $p)
-										<option value="{{Crypt::encrypt($p->id)}}">{{$p->title}}</option>
+										<option value="{{$p->title}}">{{$p->title}}</option>
 									@endforeach
 								</select>
 							</div>
@@ -237,12 +237,12 @@
 							</div>
 
 							<div class="form-group input_field_sections">
-								<label for="item-po-edit" class="form-control-label text-center sr-only">Purchase Order</label>
+								<label for="purchase-title-edit" class="form-control-label text-center sr-only">Purchase Order</label>
 
-								<select id="item-po-edit" class="form-control chzn-selectt">
-									<option value="">Select Purchase Order</option>
+								<select id="purchase-title-edit" class="form-control chzn-selectt">
+									<option value="">None</option>
 									@foreach($po as $p)
-										<option value="{{Crypt::encrypt($p->id)}}">{{$p->title}}</option>
+										<option value="{{$p->title}}">{{$p->title}}</option>
 									@endforeach
 								</select>
 							</div>
@@ -370,7 +370,7 @@
 				btn_text = btn.html(),
 				serial_no = $("#serial-no").val(),
 				item_type = $("#item-type").val(),
-				item_po = $("#item-po").val(),
+				po_title = $("#purchase-title").val(),
 				token ='{{ Session::token() }}',
 				url = "{{route('admin.inv.add')}}";
 
@@ -380,7 +380,7 @@
 				data: {
 					serial_no: serial_no,
 					item_type: item_type,
-					item_po: item_po,
+					po_title: po_title,
 					_token: token
 				},
 				beforeSend: function () {
@@ -406,13 +406,13 @@
 				tr = btn.closest('tr'),
 				serial_no = tr.data('serial-no'),
 				item_type = tr.data('item-type'),
-				item_purchase_id = tr.data('item-purchase-id'),
+				po_title = tr.data('purchase-title'),
 				hrid = tr.data('hrid'),
 				inv_id = tr.data('id');
 
 			$("#serial-no-edit").val(serial_no);
 			$("#item-type-edit").val(item_type);
-			$("#item-po-edit").val(item_purchase_id);
+			$("#purchase-title-edit").val(po_title);
 			$("#inv-id-edit").val(inv_id);
 			$("#inv-row-id").val(hrid);
 
@@ -426,7 +426,7 @@
 				btn_text = btn.html(),
 				serial_no = $("#serial-no-edit").val(),
 				item_type = $("#item-type-edit").val(),
-				item_po = $("#item-po-edit").val(),
+				po_title = $("#purchase-title-edit").val(),
 				inv_id = $("#inv-id-edit").val(),
 				load_element = "#row-" + $("#inv-row-id").val(),
 				token ='{{ Session::token() }}',
@@ -438,7 +438,7 @@
 				data: {
 					serial_no: serial_no,
 					item_type: item_type,
-					item_po: item_po,
+					po_title: po_title,
 					inv_id: inv_id,
 					_token: token
 				},
@@ -451,6 +451,7 @@
 					$('#edit-inv-modal').modal('hide');
 					$(load_element).data('serial-no',serial_no);
 					$(load_element).data('item-type',item_type);
+					$(load_element).data('purchase-title',po_title);
 					$(load_element).load(location.href + " "+ load_element +">*","");
 				},
 				error: function(jqXHR, exception){
